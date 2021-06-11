@@ -8,6 +8,7 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
+    comWorker = new COMWorker(this);
     ui.setupUi(this);
 
     serializers = new QStackedWidget(this);
@@ -54,6 +55,9 @@ MainWindow::MainWindow(QWidget *parent)
 void MainWindow::sendSerializedData(QByteArray data)
 {
     //qDebug() << data;
+    QString name = "COM1";
+    comWorker->openPort(name);
+    comWorker->sendArrayBegin(data);
 }
 
 void MainWindow::showStatusbarMessage(QString message)

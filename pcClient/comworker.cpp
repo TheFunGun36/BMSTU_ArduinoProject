@@ -1,0 +1,62 @@
+#include "comworker.h"
+
+
+COMWorker::COMWorker(QObject *parent)
+	: QObject(parent)
+{
+	bufferSize = 4;
+}
+
+COMWorker::~COMWorker()
+{
+	serialPort.close();
+}
+
+ErrorCode COMWorker::openPort(QString name)
+{
+	serialPort.setPortName(name);
+	serialPort.setBaudRate(QSerialPort::Baud9600);
+	if (!serialPort.open(QIODevice::ReadWrite)) {
+		return ErrorCode::OpenFaild;
+	}
+	return ErrorCode::Ok;
+}
+
+
+void COMWorker::sendArrayBegin(QByteArray arr)
+{
+	for (int i = 0; i < arr.size(); i += bufferSize)
+	{
+		int pkgSize = std::min(arr.size() - i, bufferSize);
+		pkgSize++;
+		QByteArray pkg(pkgSize, Qt::Initialization::Uninitialized);
+		
+
+		auto itSrc = arr.begin() + i;
+		for (auto it = pkg.begin() + 1; it != pkg.end(); it++)
+		{
+			*it = *itSrc;
+
+			itSrc++;
+		}
+
+		if (arr.size() - i > bufferSize)
+			pkg[0] = static_cast<char>(0);
+		else
+			pkg[0] = static_cast<char>(pkgSize - 1);
+		
+
+		packageQueue.enqueue(pkg);
+	}
+	
+	Q_FOREACH(QByteArray baba, packageQueue)
+	{
+		qDebug() << baba;
+	}
+	serialPort.write(packageQueue.dequeue());
+}
+
+void COMWorker::sendArray()
+{
+	serialPort.write(packageQueue.dequeue());
+}

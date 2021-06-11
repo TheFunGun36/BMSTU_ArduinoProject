@@ -49,6 +49,9 @@
     <ClCompile Include="textdeserializer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="comworker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="x64\Release\uic\ui_mainwindow.h">
@@ -60,6 +63,9 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="textserializer.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="comworker.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>

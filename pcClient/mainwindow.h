@@ -6,6 +6,7 @@
 #include "ui_mainwindow.h"
 #include "textserializer.h"
 #include "textdeserializer.h"
+#include "comworker.h"
 
 class MainWindow : public QMainWindow
 {
@@ -28,6 +29,7 @@ private:
     QStackedWidget *serializers;
     TextSerializerWidget *textSerializer;
     TextDeserializerWidget *textDeserializer;
+    COMWorker *comWorker;
     Ui::MainWindowClass ui;
 
 public slots:
