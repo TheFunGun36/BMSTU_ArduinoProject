@@ -1,6 +1,5 @@
 #include "comworker.h"
 
-
 COMWorker::COMWorker(QObject *parent)
 	: QObject(parent)
 {
@@ -14,14 +13,17 @@ COMWorker::~COMWorker()
 
 ErrorCode COMWorker::openPort(QString name)
 {
+	if (serialPort.isOpen())
+	{
+		serialPort.close();
+	}
 	serialPort.setPortName(name);
 	serialPort.setBaudRate(QSerialPort::Baud9600);
 	if (!serialPort.open(QIODevice::ReadWrite)) {
-		return ErrorCode::OpenFaild;
+		return ErrorCode::OpenFailed;
 	}
 	return ErrorCode::Ok;
 }
-
 
 void COMWorker::sendArrayBegin(QByteArray arr)
 {
@@ -45,7 +47,6 @@ void COMWorker::sendArrayBegin(QByteArray arr)
 		else
 			pkg[0] = static_cast<char>(pkgSize - 1);
 		
-
 		packageQueue.enqueue(pkg);
 	}
 	

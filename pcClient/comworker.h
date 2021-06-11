@@ -5,9 +5,8 @@
 
 enum class ErrorCode {
 	Ok,
-	OpenFaild
+	OpenFailed
 };
-
 
 class COMWorker : public QObject
 {
