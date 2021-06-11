@@ -9,7 +9,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     comWorker = new COMWorker(this);
-    ui.setupUi(this);
+    ui.setupUi(this);    
 
     serializers = new QStackedWidget(this);
     textSerializer = new TextSerializerWidget(this);
@@ -49,7 +49,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     centralWidgetLayout->addWidget(serializers);
 
-    ui.centralWidget->setLayout(centralWidgetLayout);
+    ui.centralWidget->setLayout(centralWidgetLayout);    
 }
 
 void MainWindow::sendSerializedData(QByteArray data)

@@ -15,16 +15,20 @@ private:
 	int bufferSize;
 	QSerialPort serialPort;
 	QByteArray arrayToSend;
-	QQueue<QByteArray> packageQueue;
-	void sendArray();
+	QByteArray arrayToReceive;
+	QQueue<QByteArray> packageQueue;	
 
 public:
 	ErrorCode openPort(QString name);
 	COMWorker(QObject *parent);
 	COMWorker::~COMWorker();
-	void sendArrayBegin(QByteArray arrayToSend);
+	void sendArrayBegin(QByteArray arr);
 	
 signals:
 	void arraySent();
 	void arraySentError(ErrorCode);
+
+private slots:
+	void sendArray();
+	void receiveArray();
 };
