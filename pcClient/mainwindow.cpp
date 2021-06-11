@@ -38,6 +38,7 @@ MainWindow::MainWindow(QWidget *parent)
             );
         }
     );
+    connect(ui.actionSwitchColorTheme, &QAction::triggered, this, &MainWindow::switchColorTheme);
 
     QGridLayout *centralWidgetLayout = new QGridLayout(this);
 
@@ -58,4 +59,28 @@ void MainWindow::sendSerializedData(QByteArray data)
 void MainWindow::showStatusbarMessage(QString message)
 {
     ui.statusBar->showMessage(message);
+}
+
+void MainWindow::switchColorTheme()
+{
+    static bool isDarkTheme = false;
+
+    if (isDarkTheme)
+    {
+        QFile file;
+        file.setFileName(":/MainWindow/stylesheet/lightTheme.css");
+        file.open(QFile::ReadOnly);
+        this->setStyleSheet(file.readAll());
+        file.close();
+        isDarkTheme = false;
+    }
+    else
+    {
+        QFile file;
+        file.setFileName(":/MainWindow/stylesheet/darkTheme.css");
+        file.open(QFile::ReadOnly);
+        this->setStyleSheet(file.readAll());
+        file.close();
+        isDarkTheme = true;
+    }
 }

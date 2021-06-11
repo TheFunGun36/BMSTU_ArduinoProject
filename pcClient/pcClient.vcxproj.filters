@@ -21,6 +21,9 @@
       <UniqueIdentifier>{639EADAA-A684-42e4-A9AD-28FC9BCB8F7C}</UniqueIdentifier>
       <Extensions>ts</Extensions>
     </Filter>
+    <Filter Include="Stylesheet">
+      <UniqueIdentifier>{8fc1a958-5bf0-451a-9697-86a08c4d71d6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="mainwindow.qrc">
@@ -59,5 +62,13 @@
     <QtMoc Include="textserializer.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="stylesheet\darkTheme.css">
+      <Filter>Stylesheet</Filter>
+    </None>
+    <None Include="stylesheet\lightTheme.css">
+      <Filter>Stylesheet</Filter>
+    </None>
   </ItemGroup>
 </Project>

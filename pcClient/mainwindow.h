@@ -33,4 +33,5 @@ private:
 public slots:
     void sendSerializedData(QByteArray data);
     void showStatusbarMessage(QString message);
+    void switchColorTheme();
 };

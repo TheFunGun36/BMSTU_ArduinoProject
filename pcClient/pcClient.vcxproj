@@ -108,6 +108,10 @@
     <ClInclude Include="textdeserializer.h" />
     <ClInclude Include="x64\Release\uic\ui_mainwindow.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="stylesheet\darkTheme.css" />
+    <None Include="stylesheet\lightTheme.css" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
     <Import Project="$(QtMsBuild)\qt.targets" />
