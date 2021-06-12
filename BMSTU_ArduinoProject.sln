@@ -5,16 +5,36 @@ VisualStudioVersion = 16.0.31321.278
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pcClient", "pcClient\pcClient.vcxproj", "{5F844C53-B728-45A0-A6D9-B5839CDB314F}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "arduinoTransmitter", "arduinoTransmitter\arduinoTransmitter.vcxproj", "{C5F80730-F44F-4478-BDAE-6634EFC2CA88}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "arduinoReciever", "arduinoReciever\arduinoReciever.vcxproj", "{980414D7-15A8-4C98-B758-C2A49D5D209E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
 		Release|x64 = Release|x64
+		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{5F844C53-B728-45A0-A6D9-B5839CDB314F}.Debug|x64.ActiveCfg = Debug|x64
 		{5F844C53-B728-45A0-A6D9-B5839CDB314F}.Debug|x64.Build.0 = Debug|x64
+		{5F844C53-B728-45A0-A6D9-B5839CDB314F}.Debug|x86.ActiveCfg = Debug|x64
 		{5F844C53-B728-45A0-A6D9-B5839CDB314F}.Release|x64.ActiveCfg = Release|x64
 		{5F844C53-B728-45A0-A6D9-B5839CDB314F}.Release|x64.Build.0 = Release|x64
+		{5F844C53-B728-45A0-A6D9-B5839CDB314F}.Release|x86.ActiveCfg = Release|x64
+		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Debug|x64.ActiveCfg = Debug|Win32
+		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Debug|x86.ActiveCfg = Debug|Win32
+		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Debug|x86.Build.0 = Debug|Win32
+		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Release|x64.ActiveCfg = Release|Win32
+		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Release|x86.ActiveCfg = Release|Win32
+		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Release|x86.Build.0 = Release|Win32
+		{980414D7-15A8-4C98-B758-C2A49D5D209E}.Debug|x64.ActiveCfg = Debug|Win32
+		{980414D7-15A8-4C98-B758-C2A49D5D209E}.Debug|x86.ActiveCfg = Debug|Win32
+		{980414D7-15A8-4C98-B758-C2A49D5D209E}.Debug|x86.Build.0 = Debug|Win32
+		{980414D7-15A8-4C98-B758-C2A49D5D209E}.Release|x64.ActiveCfg = Release|Win32
+		{980414D7-15A8-4C98-B758-C2A49D5D209E}.Release|x86.ActiveCfg = Release|Win32
+		{980414D7-15A8-4C98-B758-C2A49D5D209E}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
