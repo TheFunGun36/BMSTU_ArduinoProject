@@ -3,7 +3,7 @@
 COMWorker::COMWorker(QObject* parent)
 	: QObject(parent)
 {
-	bufferSize = 4;
+	bufferSize = 63;
 	comInputSize = 0;
 	state = State::Idle;	
 	ardReadyReadSymbol = '\xcc';
