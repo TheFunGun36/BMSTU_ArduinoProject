@@ -21,5 +21,7 @@ void loop() {
                 Serial.write('\xcc');
         }
         while (!isLastTransmission);
+
+        Serial.write('\xcd');
     }
 }
