@@ -14,11 +14,12 @@ namespace global
     constexpr int bitLengthMilliseconds = 50;
     constexpr int byteSize = 8;
     constexpr int hammingPackageSize = 64;
+    constexpr int outputPin = 2;
 
-    void arduinoSendByte(int pin, char byte);
-    void recievePcInfo(bool &isLastTransmission);
-    void arduinoSendInfo(int pin);
-    void otherArduinoSync(int pin);
+    void arduinoSendByte(char byte);
+    void recievePcInfo(bool &isLastTransmission, int &length);
+    void arduinoSendInfo(int length);
+    void otherArduinoSync();
 }
 
 #endif

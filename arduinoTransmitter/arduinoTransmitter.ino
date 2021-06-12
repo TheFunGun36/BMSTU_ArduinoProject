@@ -1,10 +1,8 @@
 #include "globalinfo.h"
 
-constexpr int pinLed = 2;
-
 void setup() {
     Serial.begin(9600);
-    pinMode(pinLed, OUTPUT);
+    pinMode(global::outputPin, OUTPUT);
 }
 
 void loop() {
@@ -14,9 +12,10 @@ void loop() {
 
         do
         {
-            global::recievePcInfo(isLastTransmission);
-            global::otherArduinoSync(pinLed);
-            global::arduinoSendInfo(pinLed);
+            int length;
+            global::recievePcInfo(isLastTransmission, length);
+            global::otherArduinoSync();
+            global::arduinoSendInfo(length);
 
             if (!isLastTransmission)
                 Serial.write('\xcc');

@@ -4,54 +4,37 @@ namespace global
 {
     char sendBuffer[maxBufferSize + 8]; // 8 - память под контрольные байты. 
 
-    void arduinoSendByte(int pin, char byte)
+    void arduinoSendByte(char byte)
     {
         for (int i = byteSize - 1; i >= 0; i--)
         {
-            digitalWrite(pin, ((byte >> i) & 1));
+            digitalWrite(outputPin, ((byte >> i) & 1));
             delay(bitLengthMilliseconds);
         }
     }
 
-    void recievePcInfo(bool &isLastTransmission)
+    void recievePcInfo(bool &isLastTransmission, int &length)
     {
         sendBuffer[0] = Serial.read();
         isLastTransmission = sendBuffer[0] != 0;
-        Serial.readBytes(sendBuffer + 1, (sendBuffer[0]) ? sendBuffer[0] : (maxBufferSize - 1));
+        length = sendBuffer[0] ? sendBuffer[0] : (maxBufferSize - 1);
+        Serial.readBytes(sendBuffer + 1, length);
     }
 
-    void arduinoSendInfo(int pin)
+    void arduinoSendInfo(int length)
     {
-        for (int i = 0; i < sendBuffer[0] + 1; i++)
+        for (int i = 0; i < length + 1; i++)
         {
-            arduinoSendByte(pin, sendBuffer[i]);
+            arduinoSendByte(sendBuffer[i]);
         }
-        digitalWrite(pin, LOW);
+        digitalWrite(outputPin, LOW);
     }
 
-    void otherArduinoSync(int pinLed)
+    void otherArduinoSync()
     {
-        digitalWrite(pinLed, HIGH);
+        digitalWrite(outputPin, HIGH);
         delay(4000);
-        digitalWrite(pinLed, LOW);
+        digitalWrite(outputPin, LOW);
         delay(1000);
-    }
-
-    void initializeTestPackage()
-    {
-        sendBuffer[0] = 13;
-        sendBuffer[1] = 'H';
-        sendBuffer[2] = 'e'; 
-        sendBuffer[3] = 'l';
-        sendBuffer[4] = 'l';
-        sendBuffer[5] = 'o';
-        sendBuffer[6] = ',';
-        sendBuffer[7] = ' ';
-        sendBuffer[8] = 'w';
-        sendBuffer[9] = 'o';
-        sendBuffer[10] = 'r';
-        sendBuffer[11] = 'l';
-        sendBuffer[12] = 'd';
-        sendBuffer[13] = '!';
     }
 }
