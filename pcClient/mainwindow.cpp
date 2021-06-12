@@ -9,7 +9,7 @@ MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
 {
     comWorker = new COMWorker(this);    
-    comWorker->openPort("COM3");
+    comWorker->openPort("COM8");
     ui.setupUi(this);    
 
     serializers = new QStackedWidget(this);

@@ -84,7 +84,7 @@ void COMWorker::onComInformationReceive()
 
 	switch (state)
 	{
-	case State::Idle:		
+	case State::Idle:
 		state = State::Receiving;		
 		receiveArray();
 		break;
@@ -96,8 +96,8 @@ void COMWorker::onComInformationReceive()
 		msg = serialPort->readAll();
 		if (msg.size() != 1 || msg[0] != ardReadyReadSymbol) 
 		{
-			emit workError(ErrorCode::SendFailed);
 			state = State::Idle;
+			emit workError(ErrorCode::SendFailed);
 			break;
 		}
 		sendArray();
@@ -111,15 +111,15 @@ void COMWorker::sendArray()
 {
 	if (serialPort->write(packageQueue.dequeue()) < 0)
 	{
-		emit workError(ErrorCode::SendFailed);
 		state = State::Idle;
+		emit workError(ErrorCode::SendFailed);
 		return;
 	}
 
 	if (packageQueue.isEmpty()) 
 	{
-		emit arraySent();
 		state = State::Idle;
+		emit arraySent();
 	}
 }
 

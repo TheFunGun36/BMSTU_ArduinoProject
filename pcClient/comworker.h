@@ -1,4 +1,4 @@
-#include <qserialport.h>
+#include <qserialport>
 #include <qserialportinfo.h>
 #include <qqueue.h>
 #include <qdebug.h>
