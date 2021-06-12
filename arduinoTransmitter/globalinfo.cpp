@@ -15,9 +15,12 @@ namespace global
 
     void recievePcInfo(bool &isLastTransmission, int &length)
     {
+        while (Serial.available() <= 0);
         sendBuffer[0] = Serial.read();
         isLastTransmission = sendBuffer[0] != 0;
         length = sendBuffer[0] ? sendBuffer[0] : (maxBufferSize - 1);
+
+        while (Serial.available() < length);
         Serial.readBytes(sendBuffer + 1, length);
     }
 
