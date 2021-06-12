@@ -5,11 +5,12 @@
 
 #include <qdebug.h>
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
 {
-    comWorker = new COMWorker(this);
-    ui.setupUi(this);
+    comWorker = new COMWorker(this);    
+    comWorker->openPort("COM3");
+    ui.setupUi(this);    
 
     serializers = new QStackedWidget(this);
     textSerializer = new TextSerializerWidget(this);
@@ -18,27 +19,16 @@ MainWindow::MainWindow(QWidget *parent)
     connect(textSerializer, &TextSerializerWidget::dataSerialized, this, &MainWindow::sendSerializedData);
     connect(ui.actionSetTextSendMode, &QAction::triggered, this,
         [this]() {
-            serializers->setCurrentIndex(static_cast<int>(DisplayWidget::TextSend));
-        }
+        serializers->setCurrentIndex(static_cast<int>(DisplayWidget::TextSend));
+    }
     );
     connect(ui.actionSetTextRecieveMode, &QAction::triggered, this,
         [this]() {
-            serializers->setCurrentIndex(static_cast<int>(DisplayWidget::TextRecieve));
-        }
+        serializers->setCurrentIndex(static_cast<int>(DisplayWidget::TextRecieve));
+    }
     );
-    connect(ui.actionShowAboutUsInfo, &QAction::triggered, this,
-        [this]() {
-            QMessageBox::information(
-                this, "О нас",
-                "Данная программа создана в рамках проектной практики в МГТУ им. Баумана студентами 1-го курса:\n"
-                "Чепрасов К. М.\n"
-                "Солопов Ю. В.\n"
-                "Калашков П. А.\n"
-                "Скороходова М. К.\n"
-                "Комаров Н. С.\n"
-            );
-        }
-    );
+    
+    connect(ui.actionShowAboutUsInfo, &QAction::triggered, this, &MainWindow::showInfoMessage);
     connect(ui.actionSwitchColorTheme, &QAction::triggered, this, &MainWindow::switchColorTheme);
 
     QGridLayout *centralWidgetLayout = new QGridLayout(this);
@@ -50,19 +40,62 @@ MainWindow::MainWindow(QWidget *parent)
     centralWidgetLayout->addWidget(serializers);
 
     ui.centralWidget->setLayout(centralWidgetLayout);
+
+    connect(comWorker, &COMWorker::workError, this, &MainWindow::showErrorMessage);
+    connect(comWorker, &COMWorker::arraySent, this, &MainWindow::endSending);
+    connect(comWorker, &COMWorker::arrayReceived, this, &MainWindow::endReceiving);
 }
 
 void MainWindow::sendSerializedData(QByteArray data)
 {
-    //qDebug() << data;
-    QString name = "COM1";
-    comWorker->openPort(name);
+    //qDebug() << data;    
     comWorker->sendArrayBegin(data);
+}
+
+void MainWindow::endReceiving(QByteArray msg)
+{
+    QMessageBox::information(this, "Сообщение получено", QString::fromUtf8(msg));
+}
+
+void MainWindow::endSending() 
+{
+    QMessageBox::information(this, "Выполнено", "Отправка сообщения завершена");
 }
 
 void MainWindow::showStatusbarMessage(QString message)
 {
     ui.statusBar->showMessage(message);
+}
+
+void MainWindow::showInfoMessage() 
+{
+    QMessageBox::information(
+        this, "О нас",
+        "Данная программа создана в рамках проектной практики в МГТУ им. Баумана студентами 1-го курса:\n"
+        "Чепрасов К. М.\n"
+        "Солопов Ю. В.\n"
+        "Калашков П. А.\n"
+        "Скороходова М. К.\n"
+        "Комаров Н. С.\n"
+    );    
+}
+
+void MainWindow::showErrorMessage(ErrorCode code) 
+{
+    switch (code)
+    {    
+    case ErrorCode::OpenFailed:
+        QMessageBox::information(this, "Ошибка", "Не удалось открыть SerialPort");
+        break;
+    case ErrorCode::SendFailed:
+        QMessageBox::information(this, "Ошибка", "Не удалось отправить сообщение");
+        break;
+    case ErrorCode::ReceiveFailed:
+        QMessageBox::information(this, "Ошибка", "Не удалось принять сообщение");
+        break;
+    default:
+        break;
+    }
 }
 
 void MainWindow::switchColorTheme()
