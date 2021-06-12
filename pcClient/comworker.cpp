@@ -51,39 +51,44 @@ void COMWorker::sendArrayBegin(QByteArray arr)
 		packageQueue.enqueue(pkg);
 	}
 
+	/*
 	qDebug() << "DEBUG sendArrayBegin";
 	Q_FOREACH(QByteArray baba, packageQueue)
-	{		
-		qDebug() << baba;
-	}
-
-	serialPort.write(packageQueue.dequeue());
-	if (packageQueue.isEmpty())
 	{
-		// Данные отправлены
-	}
+		qDebug() << baba;
+	} */
+
+	sendArray();
 }
 
 void COMWorker::sendArray()
 {
-	serialPort.write(packageQueue.dequeue());
+	if (serialPort.write(packageQueue.dequeue()) < 0) 
+	{
+		emit workError(ErrorCode::SendFailed);
+	}
 
 	if (packageQueue.isEmpty()) 
 	{
-		// Данные отправлены
+		emit arraySent();
 	}
 }
 
 void COMWorker::receiveArray()
 {
-	int pkgSize = serialPort.read(1).toInt();
-	int msgSize = pkgSize > 0 ? pkgSize : bufferSize;
+	int sizeByte = serialPort.read(1).toInt();
+	if (sizeByte < 0) 
+	{
+		emit workError(ErrorCode::ReceiveFailed);
+	}
+
+	int msgSize = sizeByte > 0 ? sizeByte : bufferSize;
 
 	QByteArray msg = serialPort.read(msgSize);
 	arrayToReceive.append(msg);
 
-	if (pkgSize != 0) 
+	if (sizeByte != 0) 
 	{
-		// Данные получены
+		emit arrayReceived();
 	}
 }

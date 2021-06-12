@@ -32,8 +32,14 @@ private:
     COMWorker *comWorker;
     Ui::MainWindowClass ui;
 
-public slots:
+public slots:    
+    void switchColorTheme();
+
+private slots:
     void sendSerializedData(QByteArray data);
     void showStatusbarMessage(QString message);
-    void switchColorTheme();
+    void showInfoMessage();
+    void showErrorMessage(ErrorCode code);
+    void endSending();
+    void endReceiving();
 };

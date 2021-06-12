@@ -5,7 +5,9 @@
 
 enum class ErrorCode {
 	Ok,
-	OpenFailed
+	OpenFailed,
+	SendFailed,
+	ReceiveFailed
 };
 
 class COMWorker : public QObject
@@ -16,7 +18,7 @@ private:
 	QSerialPort serialPort;
 	QByteArray arrayToSend;
 	QByteArray arrayToReceive;
-	QQueue<QByteArray> packageQueue;	
+	QQueue<QByteArray> packageQueue;
 
 public:
 	ErrorCode openPort(QString name);
@@ -26,7 +28,8 @@ public:
 	
 signals:
 	void arraySent();
-	void arraySentError(ErrorCode);
+	void arrayReceived();
+	void workError(ErrorCode);
 
 private slots:
 	void sendArray();
