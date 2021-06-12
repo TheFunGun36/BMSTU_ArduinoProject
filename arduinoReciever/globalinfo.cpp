@@ -2,61 +2,73 @@
 
 namespace global
 {
-    inline bool isLedActive(int pin)
+    char sendBuffer[maxBufferSize + 8];
+
+    inline bool isLedActive()
     {
-        return analogRead(pin) < threshold;
+        return analogRead(inputPin) < threshold;
     }
 
-    inline bool arduinoRecieveBit(int pin)
+    inline bool arduinoRecieveBit()
     {
         unsigned int timestamp = millis();
         unsigned int sum = 0;
         unsigned int flashes = 0;
 
-        while (millis() - timestamp < byteSize)
+        while (millis() - timestamp < bitLengthMilliseconds)
         {
             sum++;
-            flashes += isLedActive(pin);
+            flashes += isLedActive();
         }
 
         return flashes > (sum >> 1);  // HAHA, LOOK AT ME! IM C PROGRAMMER
     }
 
-    char arduinoRecieveByte(int pin)
+    char arduinoRecieveByte()
     {
         char result = static_cast<char>(0);
 
         for (int i = byteSize - 1; i >= 0; i--)
         {
-            result |= arduinoRecieveBit(pin) * (1 << i);
+            result |= arduinoRecieveBit() * (1 << i);
         }
 
         return result;
     }
 
-    void sendPcInfo(bool &isLastTransmission)
+    void sendPcInfo()
     {
-
+        Serial.print(sendBuffer);
+        Serial.println("");
     }
 
-    void arduinoRecieveInfo(int pin)
+    void arduinoRecieveInfo()
     {
+        sendBuffer[0] = arduinoRecieveByte();
+        int length = sendBuffer[0] == 0 ? maxBufferSize : sendBuffer[0];
 
+        for (char *ptr = sendBuffer + 1; ptr < sendBuffer + length; ptr++)
+        {
+            *ptr = arduinoRecieveByte();
+        }
     }
 
-    bool otherArduinoSync(int pin)
+    bool otherArduinoSync()
     {
         unsigned long timeStamp = millis();
 
-        while (millis() - timeStamp < 3000)
+        digitalWrite(LED_BUILTIN, HIGH);
+
+        while (millis() - timeStamp < 3800)
         {
-            bool ledActive = isLedActive(pin);
+            bool ledActive = isLedActive();
 
             if (!ledActive)
                 return false;
         }
 
-        while (isLedActive(pin));
+        digitalWrite(LED_BUILTIN, LOW);
+        while (isLedActive());
         delay(1000);
         return true;
     }

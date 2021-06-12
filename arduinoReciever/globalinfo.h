@@ -17,12 +17,13 @@ namespace global
     constexpr int bitLengthMilliseconds = 100;
     constexpr int byteSize = 8;
     constexpr int hammingPackageSize = 64;
+    constexpr uint8_t inputPin = 3;
 
-    inline bool isLedActive(int pin);
-    char arduinoRecieveByte(int pin);
-    void sendPcInfo(bool &isLastTransmission);
-    void arduinoRecieveInfo(int pin);
-    bool otherArduinoSync(int pin);
+    inline bool isLedActive();
+    char arduinoRecieveByte();
+    void sendPcInfo();
+    void arduinoRecieveInfo();
+    bool otherArduinoSync();
 }
 
 #endif

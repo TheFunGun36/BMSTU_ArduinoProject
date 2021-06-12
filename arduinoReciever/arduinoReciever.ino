@@ -1,6 +1,5 @@
 
 #include "globalinfo.h"
-constexpr uint8_t inputPin = 3;
 
 bool buffer[1000];
 
@@ -11,14 +10,13 @@ void setup() {
 }
 
 void loop() {
-
-    if (global::isLedActive(inputPin))
+    if (global::isLedActive())
     {
-        if (global::otherArduinoSync(inputPin))
+        if (global::otherArduinoSync())
         {
             digitalWrite(LED_BUILTIN, HIGH);
-            char result = global::arduinoRecieveByte(inputPin);
-            Serial.write(result);
+            global::arduinoRecieveInfo();
+            global::sendPcInfo();
         }
 
         digitalWrite(LED_BUILTIN, LOW);
