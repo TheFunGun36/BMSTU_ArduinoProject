@@ -9,9 +9,9 @@ namespace global
         return analogRead(inputPin) < threshold;
     }
 
-    inline bool arduinoRecieveBit()
+    bool arduinoRecieveBit()
     {
-        unsigned int timestamp = millis();
+        unsigned long timestamp = millis();
         unsigned int sum = 0;
         unsigned int flashes = 0;
 
@@ -30,7 +30,8 @@ namespace global
 
         for (int i = byteSize - 1; i >= 0; i--)
         {
-            result |= arduinoRecieveBit() * (1 << i);
+            bool r = arduinoRecieveBit();
+            result |= r * (1 << i);
         }
 
         return result;
@@ -47,7 +48,7 @@ namespace global
         sendBuffer[0] = arduinoRecieveByte();
         int length = sendBuffer[0] == 0 ? maxBufferSize : sendBuffer[0];
 
-        for (char *ptr = sendBuffer + 1; ptr < sendBuffer + length; ptr++)
+        for (char *ptr = sendBuffer + 1; ptr < sendBuffer + length + 1; ptr++)
         {
             *ptr = arduinoRecieveByte();
         }
@@ -69,6 +70,8 @@ namespace global
 
         digitalWrite(LED_BUILTIN, LOW);
         while (isLedActive());
+
+        digitalWrite(LED_BUILTIN, HIGH);
         delay(1000);
         return true;
     }

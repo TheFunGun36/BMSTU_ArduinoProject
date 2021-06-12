@@ -14,7 +14,7 @@ namespace global
     constexpr uint16_t threshold = 1000;
     constexpr int baudRate = 9600;
     constexpr int maxBufferSize = 64;
-    constexpr int bitLengthMilliseconds = 100;
+    constexpr int bitLengthMilliseconds = 50;
     constexpr int byteSize = 8;
     constexpr int hammingPackageSize = 64;
     constexpr uint8_t inputPin = 3;
