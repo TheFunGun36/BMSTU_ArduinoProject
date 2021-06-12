@@ -22,11 +22,9 @@ namespace global
 
     void arduinoSendInfo(int pin)
     {
-        Serial.println(static_cast<int>(sendBuffer[0]));
         for (int i = 0; i < sendBuffer[0] + 1; i++)
         {
             arduinoSendByte(pin, sendBuffer[i]);
-            Serial.println(sendBuffer[i]);
         }
         digitalWrite(pin, LOW);
     }
