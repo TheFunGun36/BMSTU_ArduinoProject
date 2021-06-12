@@ -41,5 +41,5 @@ private slots:
     void showInfoMessage();
     void showErrorMessage(ErrorCode code);
     void endSending();
-    void endReceiving();
+    void endReceiving(QByteArray msg);
 };

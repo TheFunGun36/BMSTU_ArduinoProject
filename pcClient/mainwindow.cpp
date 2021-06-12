@@ -8,8 +8,9 @@
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
 {
-    comWorker = new COMWorker(this);
-    ui.setupUi(this);
+    comWorker = new COMWorker(this);    
+    comWorker->openPort("COM3");
+    ui.setupUi(this);    
 
     serializers = new QStackedWidget(this);
     textSerializer = new TextSerializerWidget(this);
@@ -47,15 +48,13 @@ MainWindow::MainWindow(QWidget* parent)
 
 void MainWindow::sendSerializedData(QByteArray data)
 {
-    //qDebug() << data;
-    QString name = "COM1";
-    comWorker->openPort(name);
+    //qDebug() << data;    
     comWorker->sendArrayBegin(data);
 }
 
-void MainWindow::endReceiving()
+void MainWindow::endReceiving(QByteArray msg)
 {
-    QMessageBox::information(this, "Выполнено", "Получение сообщения завершено");
+    QMessageBox::information(this, "Сообщение получено", QString::fromUtf8(msg));
 }
 
 void MainWindow::endSending() 
@@ -78,7 +77,7 @@ void MainWindow::showInfoMessage()
         "Калашков П. А.\n"
         "Скороходова М. К.\n"
         "Комаров Н. С.\n"
-    );
+    );    
 }
 
 void MainWindow::showErrorMessage(ErrorCode code) 

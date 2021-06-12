@@ -10,15 +10,29 @@ enum class ErrorCode {
 	ReceiveFailed
 };
 
+enum class State 
+{
+	Idle,
+	Sending,
+	Receiving
+};
+
 class COMWorker : public QObject
 {
 	Q_OBJECT
 private:
-	int bufferSize;
-	QSerialPort serialPort;
+	char bufferSize;
+	char comInputSize;
+    char ardReadyReadSymbol;
+	State state;
+	
+	QSerialPort *serialPort;
 	QByteArray arrayToSend;
 	QByteArray arrayToReceive;
 	QQueue<QByteArray> packageQueue;
+
+	void sendArray();
+	void receiveArray();
 
 public:
 	ErrorCode openPort(QString name);
@@ -28,10 +42,9 @@ public:
 	
 signals:
 	void arraySent();
-	void arrayReceived();
+	void arrayReceived(QByteArray msg);
 	void workError(ErrorCode);
 
 private slots:
-	void sendArray();
-	void receiveArray();
+	void onComInformationReceive();	
 };
