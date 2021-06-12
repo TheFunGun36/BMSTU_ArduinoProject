@@ -5,29 +5,29 @@
 
 #include <qdebug.h>
 
-MainWindow::MainWindow(QWidget* parent)
+MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    comWorker = new COMWorker(this);    
+    comWorker = new COMWorker(this);
     comWorker->openPort("COM8");
-    ui.setupUi(this);    
+    ui.setupUi(this);
 
     serializers = new QStackedWidget(this);
     textSerializer = new TextSerializerWidget(this);
     textDeserializer = new TextDeserializerWidget(this);
 
-    connect(textSerializer, &TextSerializerWidget::dataSerialized, this, &MainWindow::sendSerializedData);
+    connect(textSerializer, &TextSerializerWidget::dataSerialized, comWorker, &COMWorker::sendArrayBegin);
     connect(ui.actionSetTextSendMode, &QAction::triggered, this,
         [this]() {
-        serializers->setCurrentIndex(static_cast<int>(DisplayWidget::TextSend));
-    }
+            serializers->setCurrentIndex(static_cast<int>(DisplayWidget::TextSend));
+        }
     );
     connect(ui.actionSetTextRecieveMode, &QAction::triggered, this,
         [this]() {
-        serializers->setCurrentIndex(static_cast<int>(DisplayWidget::TextRecieve));
-    }
+            serializers->setCurrentIndex(static_cast<int>(DisplayWidget::TextRecieve));
+        }
     );
-    
+
     connect(ui.actionShowAboutUsInfo, &QAction::triggered, this, &MainWindow::showInfoMessage);
     connect(ui.actionSwitchColorTheme, &QAction::triggered, this, &MainWindow::switchColorTheme);
 
@@ -46,18 +46,12 @@ MainWindow::MainWindow(QWidget* parent)
     connect(comWorker, &COMWorker::arrayReceived, this, &MainWindow::endReceiving);
 }
 
-void MainWindow::sendSerializedData(QByteArray data)
-{
-    //qDebug() << data;    
-    comWorker->sendArrayBegin(data);
-}
-
 void MainWindow::endReceiving(QByteArray msg)
 {
     QMessageBox::information(this, "Сообщение получено", QString::fromUtf8(msg));
 }
 
-void MainWindow::endSending() 
+void MainWindow::endSending()
 {
     QMessageBox::information(this, "Выполнено", "Отправка сообщения завершена");
 }
@@ -67,7 +61,7 @@ void MainWindow::showStatusbarMessage(QString message)
     ui.statusBar->showMessage(message);
 }
 
-void MainWindow::showInfoMessage() 
+void MainWindow::showInfoMessage()
 {
     QMessageBox::information(
         this, "О нас",
@@ -77,13 +71,13 @@ void MainWindow::showInfoMessage()
         "Калашков П. А.\n"
         "Скороходова М. К.\n"
         "Комаров Н. С.\n"
-    );    
+    );
 }
 
-void MainWindow::showErrorMessage(ErrorCode code) 
+void MainWindow::showErrorMessage(ErrorCode code)
 {
     switch (code)
-    {    
+    {
     case ErrorCode::OpenFailed:
         QMessageBox::information(this, "Ошибка", "Не удалось открыть SerialPort");
         break;
