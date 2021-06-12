@@ -1,6 +1,6 @@
 #include "globalinfo.h"
 
-constexpr int pinLed = LED_BUILTIN;
+constexpr int pinLed = 2;
 
 void setup() {
     Serial.begin(9600);
@@ -8,9 +8,9 @@ void setup() {
 }
 
 void loop() {
-    if (Serial.available() > 0)
-    {
-        bool isLastTransmission;
+    //if (Serial.available() > 0)
+    //{
+        bool isLastTransmission = 0;
 
         do
         {
@@ -22,6 +22,6 @@ void loop() {
                 Serial.write('\xcc');
         }
         while (!isLastTransmission);
-    }
-    delay(1000);
+    //}
+    delay(4000);
 }
