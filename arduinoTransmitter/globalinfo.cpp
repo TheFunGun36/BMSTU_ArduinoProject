@@ -15,10 +15,9 @@ namespace global
 
     void recievePcInfo(bool &isLastTransmission)
     {
-        global::initializeTestPackage();
-        //sendBuffer[0] = Serial.read();
-        //isLastTransmission = sendBuffer[0] != 0;
-        //Serial.readBytes(sendBuffer + 1, (sendBuffer[0]) ? sendBuffer[0] : (maxBufferSize - 1));
+        sendBuffer[0] = Serial.read();
+        isLastTransmission = sendBuffer[0] != 0;
+        Serial.readBytes(sendBuffer + 1, (sendBuffer[0]) ? sendBuffer[0] : (maxBufferSize - 1));
     }
 
     void arduinoSendInfo(int pin)

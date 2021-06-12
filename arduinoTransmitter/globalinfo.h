@@ -19,7 +19,6 @@ namespace global
     void recievePcInfo(bool &isLastTransmission);
     void arduinoSendInfo(int pin);
     void otherArduinoSync(int pin);
-    void initializeTestPackage();
 }
 
 #endif

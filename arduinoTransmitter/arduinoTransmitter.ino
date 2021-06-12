@@ -8,8 +8,8 @@ void setup() {
 }
 
 void loop() {
-    //if (Serial.available() > 0)
-    //{
+    if (Serial.available() > 0)
+    {
         bool isLastTransmission = 0;
 
         do
@@ -22,6 +22,5 @@ void loop() {
                 Serial.write('\xcc');
         }
         while (!isLastTransmission);
-    //}
-    delay(4000);
+    }
 }
