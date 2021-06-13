@@ -4,7 +4,7 @@ COMWorker::COMWorker(QObject *parent)
     : QObject(parent)
 {
     bufferSize = 63;
-    countPacks = 0;
+    countPacks = 1;
     state = State::Idle;
     ardReadErrorSymbol = '\xce';
     ardSendStartSymbol = '\xcb';
@@ -13,16 +13,6 @@ COMWorker::COMWorker(QObject *parent)
     serialPort = new QSerialPort(this);
 
     connect(serialPort, &QSerialPort::readyRead, this, &COMWorker::onComInformationReceive);
-
-    /*foreach(const QSerialPortInfo & info, QSerialPortInfo::availablePorts())
-    {
-        QSerialPort port;
-        port.setPort(info);
-        if (port.open(QIODevice::ReadWrite))
-        {
-            qDebug() << "Name" + info.portName();
-        }
-    }*/
 }
 
 COMWorker::~COMWorker()
@@ -50,8 +40,8 @@ ErrorCode COMWorker::openPort(QString name)
 void COMWorker::sendArrayBegin(QByteArray arr)
 {
     state = State::Sending;
+    arrayToSend.clear();
     emit startArraySending();
-    countPacks = 0;
 
     for (int i = 0; i < arr.size(); i += bufferSize)
     {
@@ -85,7 +75,8 @@ void COMWorker::onComInformationReceive()
     switch (state)
     {
     case State::Idle:
-        countPacks = 0;
+        arrayToReceive.clear();
+        countPacks = 1;
         if (serialPort->read(1)[0] != ardSendStartSymbol)
         {
             serialPort->readAll();
@@ -132,8 +123,6 @@ void COMWorker::onComInformationReceive()
 
 void COMWorker::sendArray()
 {
-    countPacks++;
-
     if (serialPort->write(packageQueue.dequeue()) < 0)
     {
         serialPort->readAll();
@@ -151,6 +140,8 @@ void COMWorker::sendArray()
     }
 
     newStatusMessage(QString("Отправляется пакет № ") + QString::number(countPacks));
+
+    countPacks++;
 }
 
 void COMWorker::receiveArray()
@@ -160,7 +151,7 @@ void COMWorker::receiveArray()
 
     newStatusMessage(QString("Получение пакета № ") + QString::number(countPacks) + QString(", размер: ") + QString::number(msgSize));
 
-    if (serialPort->size() >= msgSize)
+    if (serialPort->size() > msgSize)
     {
         countPacks++;
         serialPort->read(1);
@@ -168,8 +159,8 @@ void COMWorker::receiveArray()
         if (sizeByte < 0)
         {
             newStatusMessage(QString("Получение сообщения прервано"));
-            emit workError(ErrorCode::ReceiveFailed);
             state = State::Idle;
+            emit workError(ErrorCode::ReceiveFailed);
             return;
         }
 
@@ -179,7 +170,6 @@ void COMWorker::receiveArray()
         if (sizeByte != 0)
         {
             msg = arrayToReceive;
-            arrayToReceive.clear();
             state = State::Idle;
             emit arrayReceived(msg);
             return;

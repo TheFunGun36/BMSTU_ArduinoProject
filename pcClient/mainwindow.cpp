@@ -15,16 +15,45 @@ MainWindow::MainWindow(QWidget *parent)
     serializers = new QStackedWidget(this);
     textSerializer = new TextSerializerWidget(this);
     textDeserializer = new TextDeserializerWidget(this);
-
+    /*foreach(const QSerialPortInfo & info, QSerialPortInfo::availablePorts())
+    {
+        QSerialPort port;
+        port.setPort(info);
+        if (port.open(QIODevice::ReadWrite))
+        {
+            qDebug() << "Name" + info.portName();
+        }
+    }*/
     connect(textSerializer, &TextSerializerWidget::dataSerialized, comWorker, &COMWorker::sendArrayBegin);
+
     connect(ui.actionSetTextSendMode, &QAction::triggered, this,
         [this]() {
             serializers->setCurrentIndex(static_cast<int>(DisplayWidget::TextSend));
         }
     );
+
     connect(ui.actionSetTextRecieveMode, &QAction::triggered, this,
         [this]() {
             serializers->setCurrentIndex(static_cast<int>(DisplayWidget::TextRecieve));
+        }
+    );
+
+    connect(ui.menuSwitchPort, &QMenu::aboutToShow, this,
+        [this]() {
+            ui.menuSwitchPort->clear();
+            qDebug() << "adjkfghakdfg";
+
+            Q_FOREACH(const QSerialPortInfo & info, QSerialPortInfo::availablePorts())
+            {
+                QString portName = info.portName();
+                QAction *action = new QAction(portName, this);
+                connect(action, &QAction::triggered, this,
+                    [this, portName]() {
+                        showErrorMessage(comWorker->openPort(portName));
+                    }
+                );
+                ui.menuSwitchPort->addAction(action);
+            }
         }
     );
 
@@ -58,8 +87,12 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::endReceiving(QByteArray msg)
 {
-    QMessageBox::information(this, "Сообщение получено", "Перейдите в окно для прочтения полученного сообщения");
-    serializers->setCurrentIndex(static_cast<int>(DisplayWidget::TextRecieve));
+    if (serializers->currentIndex() != static_cast<int>(DisplayWidget::TextRecieve))
+    {
+        QMessageBox::information(this, "Сообщение получено", "Перейдите в окно для прочтения полученного сообщения");
+        serializers->setCurrentIndex(static_cast<int>(DisplayWidget::TextRecieve));
+    }
+
     textDeserializer->showDeserializedData(msg);
 }
 
@@ -91,15 +124,13 @@ void MainWindow::showErrorMessage(ErrorCode code)
     switch (code)
     {
     case ErrorCode::OpenFailed:
-        QMessageBox::information(this, "Ошибка", "Не удалось открыть SerialPort");
+        QMessageBox::information(this, "Ошибка", "Не удалось открыть порт");
         break;
     case ErrorCode::SendFailed:
         QMessageBox::information(this, "Ошибка", "Не удалось отправить сообщение");
         break;
     case ErrorCode::ReceiveFailed:
         QMessageBox::information(this, "Ошибка", "Не удалось принять сообщение");
-        break;
-    default:
         break;
     }
 }
