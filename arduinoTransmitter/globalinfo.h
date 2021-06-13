@@ -20,6 +20,7 @@ namespace global
     void arduinoSendInfo(int pin);
     void otherArduinoSync(int pin);
     void initializeTestPackage();
+    void codeInfo();
 }
 
 #endif
