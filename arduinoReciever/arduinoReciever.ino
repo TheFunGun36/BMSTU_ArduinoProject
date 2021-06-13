@@ -1,8 +1,6 @@
 
 #include "globalinfo.h"
 
-bool buffer[1000];
-
 void setup() {
     Serial.begin(9600);
     pinMode(LED_BUILTIN, OUTPUT);
@@ -14,9 +12,25 @@ void loop() {
     {
         if (global::otherArduinoSync())
         {
+            Serial.write('\xcb');
             digitalWrite(LED_BUILTIN, HIGH);
-            global::arduinoRecieveInfo();
-            global::sendPcInfo();
+
+            bool isLastTransmission;
+            int length;
+
+            global::arduinoRecieveInfo(isLastTransmission, length);
+            global::sendPcInfo(length);
+
+            while (!isLastTransmission && global::otherArduinoSync())
+            {
+                global::arduinoRecieveInfo(isLastTransmission, length);
+                global::sendPcInfo(length);
+            }
+
+            if (!isLastTransmission)
+            {
+                Serial.write('\xce');
+            }
         }
 
         digitalWrite(LED_BUILTIN, LOW);
