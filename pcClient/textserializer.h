@@ -8,11 +8,15 @@ class TextSerializerWidget : public QWidget
     Q_OBJECT
 
 public:
-    TextSerializerWidget(QWidget *parent = Q_NULLPTR);
+    TextSerializerWidget(QWidget *parent = Q_NULLPTR);    
 
 private:
     QPlainTextEdit *textInput;
     QPushButton *buttonSend;
+
+public slots:
+    void buttonSetEnabled();
+    void buttonSetDisabled();
 
 private slots:
     void sendButtonClicked();

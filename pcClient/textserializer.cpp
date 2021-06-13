@@ -9,7 +9,7 @@ TextSerializerWidget::TextSerializerWidget(QWidget *parent)
     QVBoxLayout *layout = new QVBoxLayout(this);
 
     textInput = new QPlainTextEdit(this);
-    buttonSend = new QPushButton("Отправить", this);
+    buttonSend = new QPushButton("Отправить", this);    
 
     connect(buttonSend, &QPushButton::clicked, this, &TextSerializerWidget::sendButtonClicked);
 
@@ -32,4 +32,14 @@ void TextSerializerWidget::sendButtonClicked()
         QByteArray result = str.toUtf8();
         emit dataSerialized(result);
     }
+}
+
+void TextSerializerWidget::buttonSetEnabled()
+{
+    buttonSend->setEnabled(true);
+}
+
+void TextSerializerWidget::buttonSetDisabled()
+{
+    buttonSend->setDisabled(true);
 }

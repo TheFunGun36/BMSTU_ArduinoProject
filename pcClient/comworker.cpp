@@ -5,8 +5,12 @@ COMWorker::COMWorker(QObject *parent)
 {
     bufferSize = 63;
     comInputSize = 0;
+    countPacks = 0;
     state = State::Idle;
-    ardReadyReadSymbol = '\xcc';
+    ardReadErrorSymbol = '\xce';
+    ardSendStartSymbol = '\xcb';
+    ardSendReadySymbol = '\xcc';
+    ardSendFinishSymbol = '\xcd';
     serialPort = new QSerialPort(this);
 
     connect(serialPort, &QSerialPort::readyRead, this, &COMWorker::onComInformationReceive);
@@ -47,6 +51,8 @@ ErrorCode COMWorker::openPort(QString name)
 void COMWorker::sendArrayBegin(QByteArray arr)
 {
     state = State::Sending;
+    emit startArraySending();
+    countPacks = 0;
 
     for (int i = 0; i < arr.size(); i += bufferSize)
     {
@@ -69,12 +75,6 @@ void COMWorker::sendArrayBegin(QByteArray arr)
         packageQueue.enqueue(pkg);
     }
 
-    qDebug() << "DEBUG sendArrayBegin";
-    Q_FOREACH(QByteArray baba, packageQueue)
-    {
-        qDebug() << baba;
-    }
-
     sendArray();
 }
 
@@ -85,51 +85,82 @@ void COMWorker::onComInformationReceive()
     switch (state)
     {
     case State::Idle:
+        countPacks = 0;
+        if (serialPort->read(1)[0] != ardSendStartSymbol)
+        {
+            serialPort->readAll();
+            newStatusMessage(QString("Получен неопознанный сигнал"));            
+            break;
+        }
         state = State::Receiving;
+        emit startArrayReceiving();
         receiveArray();
         break;
     case State::Receiving:
+        if (serialPort->peek(1)[0] == ardReadErrorSymbol) 
+        {
+            serialPort->readAll();
+            state = State::Idle;
+            newStatusMessage(QString("Получение сообщения прервано"));
+            workError(ErrorCode::ReceiveFailed);
+            break;
+        }
         receiveArray();
         break;
-    case State::Sending:
-        qDebug() << "ABOBA 3";
+    case State::Sending:        
         msg = serialPort->readAll();
-        if (msg.size() != 1 || msg[0] != ardReadyReadSymbol)
+        if (msg.size() == 1 || msg[0] == ardSendFinishSymbol) 
         {
+            newStatusMessage(QString("Сообщение отправлено. Отправлено пакетов: ") + QString(countPacks));
             state = State::Idle;
+            emit arraySent();
+            break;
+        }
+        if (msg.size() != 1 || msg[0] != ardSendReadySymbol)
+        {
+            serialPort->readAll();
+            state = State::Idle;
+            newStatusMessage(QString("Передача сообщения прервана"));
             emit workError(ErrorCode::SendFailed);
             break;
         }
         sendArray();
         break;
-    default:
-        break;
     }
 }
 
 void COMWorker::sendArray()
-{
+{    
+    countPacks++;
+
     if (serialPort->write(packageQueue.dequeue()) < 0)
     {
+        serialPort->readAll();
         state = State::Idle;
+        newStatusMessage(QString::fromUtf8("Передача сообщения прервана"));
+        //newStatusMessage(QString::fromUtf8("Test"));
         emit workError(ErrorCode::SendFailed);
         return;
-    }
+    }    
 
     if (packageQueue.isEmpty())
     {
-        state = State::Idle;
-        emit arraySent();
+        newStatusMessage(QString("Отправляется пакет № ") + QString(countPacks) + QString(" [Последний]"));
+        return;
     }
+
+    newStatusMessage(QString("Отправляется пакет № ") + QString(countPacks));
 }
 
 void COMWorker::receiveArray()
 {
+    countPacks++;
     char sizeByte = serialPort->read(1)[0];
 
     if (sizeByte < 0)
     {
-        emit workError(ErrorCode::ReceiveFailed);
+        newStatusMessage(QString("Получение сообщения прервано"));
+        emit workError(ErrorCode::ReceiveFailed);        
         state = State::Idle;
         return;
     }
@@ -143,7 +174,9 @@ void COMWorker::receiveArray()
     {
         msg = arrayToReceive;
         arrayToReceive.clear();
-        state = State::Idle;
-        emit arrayReceived(msg);
+        newStatusMessage(QString("Получение пакета № ") + QString(countPacks) + QString(" [Последнего]"));
+        return;
     }
+
+    newStatusMessage(QString("Получение пакета № ") + QString(countPacks));
 }

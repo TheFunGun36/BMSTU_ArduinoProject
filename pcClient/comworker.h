@@ -23,8 +23,12 @@ class COMWorker : public QObject
     Q_OBJECT
 private:
     char bufferSize;
-    char comInputSize;
-    char ardReadyReadSymbol;
+    char comInputSize;    
+    char ardReadErrorSymbol;
+    char ardSendStartSymbol;
+    char ardSendReadySymbol;
+    char ardSendFinishSymbol;
+    char countPacks;
     State state;
 
     QSerialPort *serialPort;
@@ -41,8 +45,11 @@ public:
     COMWorker::~COMWorker();
 
 signals:
+    void startArraySending();
     void arraySent();
+    void startArrayReceiving();
     void arrayReceived(QByteArray msg);
+    void newStatusMessage(QString msg);
     void workError(ErrorCode);
 
 private slots:

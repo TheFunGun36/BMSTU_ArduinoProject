@@ -42,13 +42,25 @@ MainWindow::MainWindow(QWidget *parent)
     ui.centralWidget->setLayout(centralWidgetLayout);
 
     connect(comWorker, &COMWorker::workError, this, &MainWindow::showErrorMessage);
+    connect(comWorker, &COMWorker::newStatusMessage, this, &MainWindow::showStatusbarMessage);
+
+    connect(comWorker, &COMWorker::startArraySending, textSerializer, &TextSerializerWidget::buttonSetDisabled);
+    connect(comWorker, &COMWorker::arraySent, textSerializer, &TextSerializerWidget::buttonSetEnabled);    
+
+    connect(comWorker, &COMWorker::startArrayReceiving, textSerializer, &TextSerializerWidget::buttonSetDisabled);
+    connect(comWorker, &COMWorker::arrayReceived, textSerializer, &TextSerializerWidget::buttonSetEnabled);
+
+    connect(comWorker, &COMWorker::workError, textSerializer, &TextSerializerWidget::buttonSetEnabled);
+
     connect(comWorker, &COMWorker::arraySent, this, &MainWindow::endSending);
     connect(comWorker, &COMWorker::arrayReceived, this, &MainWindow::endReceiving);
 }
 
 void MainWindow::endReceiving(QByteArray msg)
 {
-    QMessageBox::information(this, "Сообщение получено", QString::fromUtf8(msg));
+    QMessageBox::information(this, "Сообщение получено", "Перейдите в окно для прочтения полученного сообщения");
+    serializers->setCurrentIndex(static_cast<int>(DisplayWidget::TextRecieve));
+    textDeserializer->showDeserializedData(msg);
 }
 
 void MainWindow::endSending()
