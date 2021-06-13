@@ -29,6 +29,8 @@ void loop() {
             global::arduinoRecieveInfo(encodedMessageLength);
             global::sendPcInfo(messageLength);
 
+            
+            delay(100);
             while (recievedLength == 0)
             {
                 global::arduinoRecieveLength(recievedLength, messageLength, encodedMessageLength);
