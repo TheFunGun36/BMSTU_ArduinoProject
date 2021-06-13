@@ -23,7 +23,6 @@ class COMWorker : public QObject
     Q_OBJECT
 private:
     char bufferSize;
-    char comInputSize;    
     char ardReadErrorSymbol;
     char ardSendStartSymbol;
     char ardSendReadySymbol;

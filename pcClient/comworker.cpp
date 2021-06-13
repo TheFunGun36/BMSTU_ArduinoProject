@@ -4,7 +4,6 @@ COMWorker::COMWorker(QObject *parent)
     : QObject(parent)
 {
     bufferSize = 63;
-    comInputSize = 0;
     countPacks = 0;
     state = State::Idle;
     ardReadErrorSymbol = '\xce';
@@ -80,6 +79,7 @@ void COMWorker::sendArrayBegin(QByteArray arr)
 
 void COMWorker::onComInformationReceive()
 {
+    qDebug() << serialPort->peek(255);
     QByteArray msg;
 
     switch (state)
@@ -89,7 +89,7 @@ void COMWorker::onComInformationReceive()
         if (serialPort->read(1)[0] != ardSendStartSymbol)
         {
             serialPort->readAll();
-            newStatusMessage(QString("Получен неопознанный сигнал"));
+            newStatusMessage(QString("РџРѕР»СѓС‡РµРЅ РЅРµРѕРїРѕР·РЅР°РЅРЅС‹Р№ СЃРёРіРЅР°Р»"));
             break;
         }
         state = State::Receiving;
@@ -97,11 +97,12 @@ void COMWorker::onComInformationReceive()
         receiveArray();
         break;
     case State::Receiving:
+        //qDebug() << static_cast<int>(serialPort->peek(1)[0]);
         if (serialPort->peek(1)[0] == ardReadErrorSymbol)
         {
             serialPort->readAll();
             state = State::Idle;
-            newStatusMessage(QString("Получение сообщения прервано"));
+            newStatusMessage(QString("РџРѕР»СѓС‡РµРЅРёРµ СЃРѕРѕР±С‰РµРЅРёСЏ РїСЂРµСЂРІР°РЅРѕ"));
             workError(ErrorCode::ReceiveFailed);
             break;
         }
@@ -111,7 +112,7 @@ void COMWorker::onComInformationReceive()
         msg = serialPort->readAll();
         if (msg.size() == 1 || msg[0] == ardSendFinishSymbol)
         {
-            newStatusMessage(QString("Сообщение отправлено. Отправлено пакетов: ") + QString(countPacks));
+            newStatusMessage(QString("РЎРѕРѕР±С‰РµРЅРёРµ РѕС‚РїСЂР°РІР»РµРЅРѕ. РћС‚РїСЂР°РІР»РµРЅРѕ РїР°РєРµС‚РѕРІ: ") + QString::number(countPacks));
             state = State::Idle;
             emit arraySent();
             break;
@@ -120,7 +121,7 @@ void COMWorker::onComInformationReceive()
         {
             serialPort->readAll();
             state = State::Idle;
-            newStatusMessage(QString("Передача сообщения прервана"));
+            newStatusMessage(QString("РџРµСЂРµРґР°С‡Р° СЃРѕРѕР±С‰РµРЅРёСЏ РїСЂРµСЂРІР°РЅР°"));
             emit workError(ErrorCode::SendFailed);
             break;
         }
@@ -137,7 +138,7 @@ void COMWorker::sendArray()
     {
         serialPort->readAll();
         state = State::Idle;
-        newStatusMessage(QString::fromUtf8("Передача сообщения прервана"));
+        newStatusMessage("РџРµСЂРµРґР°С‡Р° СЃРѕРѕР±С‰РµРЅРёСЏ РїСЂРµСЂРІР°РЅР°");
         //newStatusMessage(QString::fromUtf8("Test"));
         emit workError(ErrorCode::SendFailed);
         return;
@@ -145,26 +146,28 @@ void COMWorker::sendArray()
 
     if (packageQueue.isEmpty())
     {
-        newStatusMessage(QString("Отправляется пакет № ") + QString(countPacks) + QString(" [Последний]"));
+        newStatusMessage(QString("РћС‚РїСЂР°РІР»СЏРµС‚СЃСЏ РїР°РєРµС‚ в„– ") + QString::number(countPacks) + QString(" [РџРѕСЃР»РµРґРЅРёР№]"));
         return;
     }
 
-    newStatusMessage(QString("Отправляется пакет № ") + QString(countPacks));
+    newStatusMessage(QString("РћС‚РїСЂР°РІР»СЏРµС‚СЃСЏ РїР°РєРµС‚ в„– ") + QString::number(countPacks));
 }
 
 void COMWorker::receiveArray()
 {
-    countPacks++;
     char sizeByte = serialPort->peek(1)[0];
     char msgSize = sizeByte > 0 ? sizeByte : bufferSize;
 
+    newStatusMessage(QString("РџРѕР»СѓС‡РµРЅРёРµ РїР°РєРµС‚Р° в„– ") + QString::number(countPacks) + QString(", СЂР°Р·РјРµСЂ: ") + QString::number(msgSize));
+
     if (serialPort->size() >= msgSize)
     {
+        countPacks++;
         serialPort->read(1);
 
         if (sizeByte < 0)
         {
-            newStatusMessage(QString("Получение сообщения прервано"));
+            newStatusMessage(QString("РџРѕР»СѓС‡РµРЅРёРµ СЃРѕРѕР±С‰РµРЅРёСЏ РїСЂРµСЂРІР°РЅРѕ"));
             emit workError(ErrorCode::ReceiveFailed);
             state = State::Idle;
             return;
@@ -181,7 +184,5 @@ void COMWorker::receiveArray()
             emit arrayReceived(msg);
             return;
         }
-
-        newStatusMessage(QString("Получение пакета № ") + QString(countPacks));
     }
 }
