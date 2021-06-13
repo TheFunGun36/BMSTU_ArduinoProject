@@ -1,8 +1,6 @@
 
 #include "globalinfo.h"
 
-bool buffer[1000];
-
 void setup() {
     Serial.begin(9600);
     pinMode(LED_BUILTIN, OUTPUT);
@@ -10,13 +8,41 @@ void setup() {
 }
 
 void loop() {
+    if (Serial.available() > 0)
+    {
+        byte ping = Serial.read();
+        
+        if (ping == '\xc0')
+            Serial.write('\xc0');
+    }
     if (global::isLedActive())
     {
         if (global::otherArduinoSync())
         {
+            Serial.write('\xcb');
             digitalWrite(LED_BUILTIN, HIGH);
-            global::arduinoRecieveInfo();
-            global::sendPcInfo();
+
+            byte recievedLength, messageLength, encodedMessageLength;
+
+            global::arduinoRecieveLength(recievedLength, messageLength, encodedMessageLength);
+            Serial.write(recievedLength);
+            global::arduinoRecieveInfo(encodedMessageLength);
+            global::sendPcInfo(messageLength);
+
+            
+            delay(100);
+            while (recievedLength == 0)
+            {
+                global::arduinoRecieveLength(recievedLength, messageLength, encodedMessageLength);
+                Serial.write(recievedLength);
+                global::arduinoRecieveInfo(encodedMessageLength);
+                global::sendPcInfo(messageLength);
+            }
+
+            if (recievedLength == 0)
+            {
+                Serial.write('\xce');
+            }
         }
 
         digitalWrite(LED_BUILTIN, LOW);

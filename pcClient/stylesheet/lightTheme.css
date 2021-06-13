@@ -1,0 +1,94 @@
+QWidget {
+	background: #eaeaea;
+	color: #000;
+}
+
+QMenuBar {
+	background: #eaeaea;
+}
+
+QMenuBar::item {
+	background: transparent;
+}
+
+QMenuBar::item:selected {
+	background: #e0e0e0;
+}
+
+QMenuBar::item:pressed {
+	background: #e0e0e0;
+}
+
+QMenu {
+	background: #e0e0e0;
+}
+
+QMenu::item {
+	background: transparent;
+}
+
+QMenu::item:selected {
+	background: #f2f2f2;
+}
+
+QMenu::item:pressed {
+	background: #fafafa;
+}
+
+QStatusBar {
+	padding-left: 8px;
+	background: white;
+	color: black;
+	font-weight: bold;
+}
+
+QMainWindow::separator {
+	background: #505050;
+	width: 1px;
+	height: 1px;
+}
+
+QScrollBar:horizontal {
+	background: #eee;
+	height: 15px;
+}
+
+QScrollBar:vertical {
+	background: #fff;
+	width: 15px;
+}
+
+QScrollBar::handle {
+	background: #aaa;
+	margin: 4px 4px 4px 4px;
+}
+
+QScrollBar::add-line {
+	background: #fff;
+	width: 0px;
+	height: 0px;
+}
+
+QScrollBar::sub-line {
+	background: #fff;
+	width: 0px;
+	height: 0px;
+}
+
+QScrollBar::add-page {
+	background: #fff;
+}
+
+QScrollBar::sub-page {
+	background: #fff;
+}
+
+QPlainTextEdit {
+	background: #fff;
+	border: #fff;
+}
+
+QPushButton {
+	background: #fff;
+	color: #000;
+}
