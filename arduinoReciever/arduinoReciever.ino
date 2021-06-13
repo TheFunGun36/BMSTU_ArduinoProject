@@ -30,6 +30,7 @@ void loop() {
             global::arduinoRecieveInfo(length);
             global::sendPcInfo(length);
 
+            delay(100);
             while (!isLastTransaction && global::otherArduinoSync())
             {
                 global::arduinoRecieveLength(isLastTransaction, length);
