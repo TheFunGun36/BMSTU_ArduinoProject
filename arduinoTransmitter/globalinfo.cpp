@@ -99,7 +99,15 @@ namespace global
 
     int hem(char *str, int size_str, char *str_out, int size_str_out)
     {
-        int ctrlBitsNumber = 7;
+        int ctrlBitsNumber = 0;
+        if (size_str == 8)
+        {
+            ctrlBitsNumber = 7;
+        }
+        else if (size_str == 1)
+        {
+            ctrlBitsNumber = 4;
+        }
         bool calculatedCtrlBits[ctrlBitsNumber];
         for (int i = 0; i < ctrlBitsNumber; i++)
         {
@@ -122,22 +130,31 @@ namespace global
     void codeInfo()
     {
         int size_sendBuffer = int(sendBuffer[0]);
+        int size_miniBuffer = 8;
+        if (size_sendBuffer % size_miniBuffer != 0)
+        {
+            size_sendBuffer = ((size_sendBuffer / size_miniBuffer) + 1) * size_miniBuffer;
+            sendBuffer[0] = char(size_sendBuffer);
+        }
+
+        char code_size_sendBuffer[2];
+        hem(sendBuffer, 1, code_size_sendBuffer, 2);
 
         char code_sendBuffer[maxBufferSize + 8];
         int i_code_sendBuffer = 0;
 
-        char miniBuffer[8], code_miniBuffer[9];
+        char miniBuffer[size_miniBuffer], code_miniBuffer[size_miniBuffer + 1];
         int j = 0;
 
         for (int i = 1; i < size_sendBuffer; i++)
         {
-            if (i % 8 != 0)
+            if (i % size_miniBuffer != 0)
             {
                 miniBuffer[j] = sendBuffer[i];
             }
             else
             {
-                hem(miniBuffer, j, code_miniBuffer, j + 1);
+                hem(miniBuffer, j, code_miniBuffer, j + j/size_miniBuffer);
                 for (int k = 0; k < j && i_code_sendBuffer < size_sendBuffer + 8; k++)
                 {
                     code_sendBuffer[i_code_sendBuffer++] = code_miniBuffer[k];
@@ -146,8 +163,12 @@ namespace global
             }
         }
 
-        for (int i = 1; i < size_sendBuffer; i++)
+        for (int i = 0; i < size_sendBuffer; i++)
         {
+            if (i == 0 || i == 1)
+            {
+                sendBuffer[i] = code_size_sendBuffer[i];
+            }
             sendBuffer[i] = code_sendBuffer[i - 1];
         }
     }
