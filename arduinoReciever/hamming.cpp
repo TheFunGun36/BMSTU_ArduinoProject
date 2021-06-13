@@ -14,8 +14,8 @@ void getHammingMessage(char message[], char trueMessage[], int ctrlBitsNumber, i
 {
     bool receivedCtrlBits[CTRL_BITS_NUMBER] = { 0 };
     bool calculatedCtrlBits[CTRL_BITS_NUMBER] = { 0 };
-    getCtrlBits(message, receivedCtrlBits);
-    calculateCtrlBits(message, calculatedCtrlBits);
+    getCtrlBits(message, receivedCtrlBits, ctrlBitsNumber);
+    calculateCtrlBits(message, calculatedCtrlBits, ctrlBitsNumber, (ctrlBitsNumber + messageLength));
     bool isRight = true;
     int i, indexOfWrongBit = - 1;
     for (i = 0; i < ctrlBitsNumber; i++)
@@ -26,7 +26,7 @@ void getHammingMessage(char message[], char trueMessage[], int ctrlBitsNumber, i
         }
     if (!isRight)
         message[indexOfWrongBit / 8] ^= (1 << (indexOfWrongBit % 8));
-    getTrueMessage(message, trueMessage);
+    getTrueMessage(message, trueMessage, messageLength, (ctrlBitsNumber + messageLength));
 }
 
 void getCtrlBits(char message[], bool receivedCtrlBits[], int ctrlBitsNumber)
