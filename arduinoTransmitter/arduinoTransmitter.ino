@@ -1,27 +1,36 @@
 #include "globalinfo.h"
 
-constexpr int pinLed = 2;
-
 void setup() {
     Serial.begin(9600);
-    pinMode(pinLed, OUTPUT);
+    pinMode(global::outputPin, OUTPUT);
 }
 
 void loop() {
-    //if (Serial.available() > 0)
-    //{
-        bool isLastTransmission = 0;
-
-        do
+    if (Serial.available() > 0)
+    {
+        if (Serial.peek() == '\xc0')
+            Serial.write('\xc0');
+        else
         {
-            global::recievePcInfo(isLastTransmission);
-            global::otherArduinoSync(pinLed);
-            global::arduinoSendInfo(pinLed);
+            bool isLastTransmission = 0;
 
-            if (!isLastTransmission)
-                Serial.write('\xcc');
+            do
+            {
+                int length;
+                global::recievePcInfo(isLastTransmission, length);
+                global::otherArduinoSync();
+                global::arduinoSendInfo(length);
+
+                if (!isLastTransmission)
+                    Serial.write('\xcc');
+            }
+            while (!isLastTransmission);
+
+            Serial.write('\xcd');
         }
-        while (!isLastTransmission);
-    //}
-    delay(4000);
+    }
+    digitalWrite(global::outputPin, HIGH);
+    delay(500);
+    digitalWrite(global::outputPin, LOW);
+    delay(500);
 }

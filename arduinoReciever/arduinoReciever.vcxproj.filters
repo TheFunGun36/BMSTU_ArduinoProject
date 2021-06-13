@@ -24,9 +24,15 @@
     <ClInclude Include="globalinfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="hamming.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="globalinfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="hamming.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

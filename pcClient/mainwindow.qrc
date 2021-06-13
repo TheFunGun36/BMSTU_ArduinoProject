@@ -1,4 +1,6 @@
 <RCC>
-    <qresource prefix="MainWindow">
+    <qresource prefix="/MainWindow">
+        <file>stylesheet/darkTheme.css</file>
+        <file>stylesheet/lightTheme.css</file>
     </qresource>
 </RCC>

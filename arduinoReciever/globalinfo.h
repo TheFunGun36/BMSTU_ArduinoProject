@@ -20,10 +20,11 @@ namespace global
     constexpr uint8_t inputPin = 3;
 
     inline bool isLedActive();
-    char arduinoRecieveByte();
-    void sendPcInfo();
-    void arduinoRecieveInfo();
+    byte arduinoRecieveByte();
+    void sendPcInfo(byte length);
     bool otherArduinoSync();
+    void arduinoRecieveLength(byte &lengthRecieved, byte &length, byte &trueLength);
+    void arduinoRecieveInfo(byte trueLength);
 }
 
 #endif
