@@ -6,11 +6,11 @@
 #define TRUE_LENGTH (MESSAGE_LENGTH + CTRL_BITS_NUMBER)
 
 
-void getCtrlBits(char message[], bool receivedCtrlBits[], int ctrlBitsNumber);
-void calculateCtrlBits(char message[], bool calculatedCtrlBits[], int ctrlBitsNumber, int trueLength);
-void getTrueMessage(char message[], char trueMessage[], int messageLength, int trueLength);
+void getCtrlBits(byte message[], bool receivedCtrlBits[], int ctrlBitsNumber);
+void calculateCtrlBits(byte message[], bool calculatedCtrlBits[], int ctrlBitsNumber, int trueLength);
+void getTrueMessage(byte message[], byte trueMessage[], int messageLength, int trueLength);
 
-void getHammingMessage(char message[], char trueMessage[], int ctrlBitsNumber, int messageLength)
+void getHammingMessage(byte message[], byte trueMessage[], int ctrlBitsNumber, int messageLength)
 {
     bool receivedCtrlBits[CTRL_BITS_NUMBER] = { 0 };
     bool calculatedCtrlBits[CTRL_BITS_NUMBER] = { 0 };
@@ -29,7 +29,7 @@ void getHammingMessage(char message[], char trueMessage[], int ctrlBitsNumber, i
     getTrueMessage(message, trueMessage, messageLength, (ctrlBitsNumber + messageLength));
 }
 
-void getCtrlBits(char message[], bool receivedCtrlBits[], int ctrlBitsNumber)
+void getCtrlBits(byte message[], bool receivedCtrlBits[], int ctrlBitsNumber)
 {
     int i = 0, ctrlBitNumber = 0, index = 0;
     while (i < ctrlBitsNumber)
@@ -46,7 +46,7 @@ void getCtrlBits(char message[], bool receivedCtrlBits[], int ctrlBitsNumber)
     }
 }
 
-void calculateCtrlBits(char message[], bool calculatedCtrlBits[], int ctrlBitsNumber, int trueLength)
+void calculateCtrlBits(byte message[], bool calculatedCtrlBits[], int ctrlBitsNumber, int trueLength)
 {
     int i, bitPosition = 0, t;
     bool bit;
@@ -76,7 +76,7 @@ void calculateCtrlBits(char message[], bool calculatedCtrlBits[], int ctrlBitsNu
     }
 }
 
-void getTrueMessage(char message[], char trueMessage[], int messageLength, int trueLength)
+void getTrueMessage(byte message[], byte trueMessage[], int messageLength, int trueLength)
 {
     int number = 4, i = 2, j = 0;
     for (i = 2; i < trueLength && j < trueLength; i++)

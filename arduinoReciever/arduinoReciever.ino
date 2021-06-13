@@ -10,7 +10,7 @@ void setup() {
 void loop() {
     if (Serial.available() > 0)
     {
-        char ping = Serial.read();
+        byte ping = Serial.read();
         
         if (ping == '\xc0')
             Serial.write('\xc0');
@@ -22,23 +22,22 @@ void loop() {
             Serial.write('\xcb');
             digitalWrite(LED_BUILTIN, HIGH);
 
-            bool isLastTransaction;
-            int length;
+            byte recievedLength, messageLength, encodedMessageLength;
 
-            global::arduinoRecieveLength(isLastTransaction, length);
-            Serial.write(length * isLastTransaction);
-            global::arduinoRecieveInfo(length);
-            global::sendPcInfo(length);
+            global::arduinoRecieveLength(recievedLength, messageLength, encodedMessageLength);
+            Serial.write(recievedLength);
+            global::arduinoRecieveInfo(encodedMessageLength);
+            global::sendPcInfo(messageLength);
 
-            while (!isLastTransaction && global::otherArduinoSync())
+            while (recievedLength == 0)
             {
-                global::arduinoRecieveLength(isLastTransaction, length);
-                Serial.write(length * isLastTransaction);
-                global::arduinoRecieveInfo(length);
-                global::sendPcInfo(length);
+                global::arduinoRecieveLength(recievedLength, messageLength, encodedMessageLength);
+                Serial.write(recievedLength);
+                global::arduinoRecieveInfo(encodedMessageLength);
+                global::sendPcInfo(messageLength);
             }
 
-            if (!isLastTransaction)
+            if (recievedLength == 0)
             {
                 Serial.write('\xce');
             }

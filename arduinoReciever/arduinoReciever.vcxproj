@@ -116,10 +116,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="globalinfo.h" />
+    <ClInclude Include="hamming.h" />
     <ClInclude Include="__vm\.arduinoReciever.vsarduino.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="globalinfo.cpp" />
+    <ClCompile Include="hamming.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
