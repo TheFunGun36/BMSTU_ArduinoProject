@@ -1,4 +1,3 @@
-
 #include "globalinfo.h"
 
 void setup() {
@@ -14,6 +13,8 @@ void loop() {
         
         if (ping == '\xc0')
             Serial.write('\xc0');
+        else
+            Serial.write('\xce');
     }
     if (global::isLedActive())
     {
@@ -22,7 +23,7 @@ void loop() {
             Serial.write('\xcb');
             digitalWrite(LED_BUILTIN, HIGH);
 
-            byte recievedLength, messageLength, encodedMessageLength;
+            char recievedLength, messageLength, encodedMessageLength;
 
             global::arduinoRecieveLength(recievedLength, messageLength, encodedMessageLength);
             Serial.write(recievedLength);
