@@ -25,6 +25,8 @@ namespace global
 
         recievingBitIndex++;
 
+        syncTime -= recievingBitIndex % 16 == 0;
+
         return flashes > (sum >> 1);  // HAHA, LOOK AT ME! IM C PROGRAMMER
     }
 
