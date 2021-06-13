@@ -101,7 +101,7 @@ void COMWorker::onComInformationReceive()
         break;
     case State::Sending:
         msg = serialPort->readAll();
-        if (msg.size() == 1 || msg[0] == ardSendFinishSymbol)
+        if (msg.size() == 1 && msg[0] == ardSendFinishSymbol)
         {
             newStatusMessage(QString("Сообщение отправлено. Отправлено пакетов: ") + QString::number(countPacks));
             state = State::Idle;
