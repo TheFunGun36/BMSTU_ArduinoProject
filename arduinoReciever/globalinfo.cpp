@@ -1,8 +1,9 @@
 #include "globalinfo.h"
-
+#include "hamming.h"
 namespace global
 {
-    char sendBuffer[maxBufferSize + 8];
+    byte sendBuffer[maxBufferSize + 8];
+    byte sendMessage[maxBufferSize];
     unsigned long syncTime = 0;
     unsigned int recievingBitIndex = 1;
 
@@ -30,9 +31,9 @@ namespace global
         return flashes > (sum >> 1);  // HAHA, LOOK AT ME! IM C PROGRAMMER
     }
 
-    char arduinoRecieveByte()
+    byte arduinoRecieveByte()
     {
-        char result = static_cast<char>(0);
+        byte result = 0;
 
         for (int i = byteSize - 1; i >= 0; i--)
         {
@@ -46,21 +47,45 @@ namespace global
     void sendPcInfo(int length)
     {
         for (int i = 1; i < length + 1; i++)
-            Serial.write(sendBuffer[i]);
+            Serial.write(sendMessage[i]);
     }
 
-    void arduinoRecieveLength(bool &isLastTransaction, int &length)
+    void receiveLength(byte *length)
     {
-        sendBuffer[0] = arduinoRecieveByte();
-        isLastTransaction = sendBuffer[0];
-        length = isLastTransaction ? sendBuffer[0] : (maxBufferSize - 1);
+        byte encodedLength[] = { 0, 0 };
+        encodedLength[0] = arduinoRecieveByte();
+        encodedLength[1] = arduinoRecieveByte();
+        getHammingMessage(encodedLength, length, 4, 8);
     }
 
-    void arduinoRecieveInfo(int length)
+    void receivePackage(byte onePackage[])
     {
-        for (char *ptr = sendBuffer + 1; ptr < sendBuffer + length + 1; ptr++)
+        for (byte *ptr = onePackage; ptr < ptr + PACKAGE_SIZE; ptr++)
         {
             *ptr = arduinoRecieveByte();
+        }
+    }
+
+    void arduinoRecieveLength(int &lengthRecieved, int &length, int &trueLength)
+    {
+        receiveLength(&lengthRecieved);
+        int length = lengthRecieved == 0 ? (maxBufferSize - 1) : sendBuffer[0];
+        trueLength = length;
+        if ((length % 8) != 0)
+            trueLength = ((length / 8) + 1) * 8;
+        trueLength += trueLength / 8;
+        length = ch;
+    }
+
+    void arduinoRecieveInfo(int trueLength)
+    {
+        byte onePackage[PACKAGE_SIZE];
+        byte *ptr = sendMessage;
+        for (int i = 0; i < trueLength; i += PACKAGE_SIZE)
+        {
+            receivePackage(onePackage);
+            getHammingMessage(onePackage, ptr, 7, 64);
+            ptr += PACKAGE_SIZE - 1;
         }
     }
 
