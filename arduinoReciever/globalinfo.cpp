@@ -1,8 +1,9 @@
 #include "globalinfo.h"
-
+#include "hamming.h"
 namespace global
 {
     char sendBuffer[maxBufferSize + 8];
+    char sendMessage[maxBufferSize];
 
     inline bool isLedActive()
     {
@@ -39,7 +40,8 @@ namespace global
 
     void sendPcInfo()
     {
-        Serial.print(sendBuffer);
+        Serial.print(sendMessage);
+        //Serial.print(sendBuffer);
         Serial.println("");
     }
 
@@ -51,6 +53,41 @@ namespace global
         for (char *ptr = sendBuffer + 1; ptr < sendBuffer + length + 1; ptr++)
         {
             *ptr = arduinoRecieveByte();
+        }
+    }
+
+    void receiveLength(char* length)
+    {
+        char encodedLength[] = { 0, 0 };
+        encodedLength[0] = arduinoRecieveByte(); 
+        encodedLength[1] = arduinoRecieveByte(); 
+        getHammingMessage(encodedLength, length, 4, 8);
+    }
+
+    void receivePackage(char onePackage[])
+    {
+        for (char* ptr = onePackage; ptr < ptr + PACKAGE_SIZE; ptr++)
+        {
+            *ptr = arduinoRecieveByte();
+        }
+    }
+
+    void encodeInfo(void)
+    {
+        char ch = 0;
+        receiveLength(&ch);
+        int length = ch == 0 ? maxBufferSize : sendBuffer[0];
+        int trueLength = length;
+        if ((length % 8) != 0)
+            trueLength = ((length / 8) + 1) * 8;
+        trueLength += trueLength / 8;
+        char onePackage[PACKAGE_SIZE];
+        char *ptr = sendMessage;
+        for (int i = 0; i < trueLength; i += PACKAGE_SIZE)
+        {
+            receivePackage(onePackage);
+            getHammingMessage(onePackage, ptr, 7, 64);
+            ptr += PACKAGE_SIZE - 1;
         }
     }
 
