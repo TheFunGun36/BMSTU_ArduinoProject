@@ -9,7 +9,7 @@ void setup() {
 void loop() {
     if (Serial.available() > 0)
     {
-        byte ping = Serial.read();
+        char ping = Serial.read();
         
         if (ping == '\xc0')
             Serial.write('\xc0');
