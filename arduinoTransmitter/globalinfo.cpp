@@ -3,13 +3,16 @@
 namespace global
 {
     char sendBuffer[maxBufferSize + 8]; // 8 - память под контрольные байты. 
+    unsigned long syncTime = 0;
+    unsigned int bitsSent = 0;
 
     void arduinoSendByte(char byte)
     {
         for (int i = byteSize - 1; i >= 0; i--)
         {
             digitalWrite(outputPin, ((byte >> i) & 1));
-            delay(bitLengthMilliseconds);
+            bitsSent++;
+            while (millis() < syncTime + bitsSent * bitLengthMilliseconds);
         }
     }
 
@@ -35,9 +38,11 @@ namespace global
 
     void otherArduinoSync()
     {
+        bitsSent = 0;
         digitalWrite(outputPin, HIGH);
         delay(4000);
         digitalWrite(outputPin, LOW);
         delay(1000);
+        syncTime = millis();
     }
 }
