@@ -45,16 +45,19 @@ namespace global
 
     void sendPcInfo(int length)
     {
-        for (int i = 0; i < length + 1; i++)
+        for (int i = 1; i < length + 1; i++)
             Serial.write(sendBuffer[i]);
     }
 
-    void arduinoRecieveInfo(bool &isLastTransmission, int &length)
+    void arduinoRecieveLength(bool &isLastTransaction, int &length)
     {
         sendBuffer[0] = arduinoRecieveByte();
-        isLastTransmission = sendBuffer[0] != 0;
-        length = isLastTransmission ? sendBuffer[0] : (maxBufferSize - 1);
+        isLastTransaction = sendBuffer[0];
+        length = isLastTransaction ? sendBuffer[0] : (maxBufferSize - 1);
+    }
 
+    void arduinoRecieveInfo(int length)
+    {
         for (char *ptr = sendBuffer + 1; ptr < sendBuffer + length + 1; ptr++)
         {
             *ptr = arduinoRecieveByte();

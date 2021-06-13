@@ -22,7 +22,8 @@ namespace global
     inline bool isLedActive();
     char arduinoRecieveByte();
     void sendPcInfo(int length);
-    void arduinoRecieveInfo(bool &isLastTransmission, int &length);
+    void arduinoRecieveLength(bool &isLastTransaction, int &length);
+    void arduinoRecieveInfo(int length);
     bool otherArduinoSync();
 }
 

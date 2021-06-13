@@ -15,19 +15,23 @@ void loop() {
             Serial.write('\xcb');
             digitalWrite(LED_BUILTIN, HIGH);
 
-            bool isLastTransmission;
+            bool isLastTransaction;
             int length;
 
-            global::arduinoRecieveInfo(isLastTransmission, length);
+            global::arduinoRecieveLength(isLastTransaction, length);
+            Serial.write(length * isLastTransaction);
+            global::arduinoRecieveInfo(length);
             global::sendPcInfo(length);
 
-            while (!isLastTransmission && global::otherArduinoSync())
+            while (!isLastTransaction && global::otherArduinoSync())
             {
-                global::arduinoRecieveInfo(isLastTransmission, length);
+                global::arduinoRecieveLength(isLastTransaction, length);
+                Serial.write(length * isLastTransaction);
+                global::arduinoRecieveInfo(length);
                 global::sendPcInfo(length);
             }
 
-            if (!isLastTransmission)
+            if (!isLastTransaction)
             {
                 Serial.write('\xce');
             }
