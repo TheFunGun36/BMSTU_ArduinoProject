@@ -6,6 +6,8 @@
 #include "ui_mainwindow.h"
 #include "textserializer.h"
 #include "textdeserializer.h"
+#include "fileserializer.h"
+#include "filedeserializer.h"
 #include "comworker.h"
 
 class MainWindow : public QMainWindow
@@ -20,8 +22,6 @@ private:
     {
         TextSend,
         TextRecieve,
-        ImageSend,
-        ImageRecieve,
         FileSend,
         FileRecieve
     };
@@ -29,6 +29,8 @@ private:
     QStackedWidget *serializers;
     TextSerializerWidget *textSerializer;
     TextDeserializerWidget *textDeserializer;
+    FileSerializerWidget *fileSerializer;
+    FileDeserializerWidget *fileDeserializer;
     COMWorker *comWorker;
     Ui::MainWindowClass ui;
 

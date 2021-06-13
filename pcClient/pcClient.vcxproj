@@ -96,6 +96,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="comworker.cpp" />
+    <ClCompile Include="filedeserializer.cpp" />
+    <ClCompile Include="fileserializer.cpp" />
     <ClCompile Include="textdeserializer.cpp" />
     <ClCompile Include="textserializer.cpp" />
     <QtRcc Include="mainwindow.qrc" />
@@ -107,8 +109,9 @@
   <ItemGroup>
     <QtMoc Include="textserializer.h" />
     <QtMoc Include="comworker.h" />
+    <QtMoc Include="fileserializer.h" />
+    <QtMoc Include="filedeserializer.h" />
     <ClInclude Include="textdeserializer.h" />
-    <ClInclude Include="x64\Release\uic\ui_mainwindow.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="stylesheet\darkTheme.css" />

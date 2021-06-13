@@ -29,7 +29,9 @@ void TextSerializerWidget::sendButtonClicked()
     }
     else
     {
-        QByteArray result = str.toUtf8();
+        QByteArray result;
+        result.append('t');
+        result.append(str.toUtf8());
         emit dataSerialized(result);
     }
 }

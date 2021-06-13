@@ -52,11 +52,14 @@
     <ClCompile Include="comworker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="fileserializer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="filedeserializer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="x64\Release\uic\ui_mainwindow.h">
-      <Filter>Translation Files</Filter>
-    </ClInclude>
     <ClInclude Include="textdeserializer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -66,6 +69,12 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="comworker.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="fileserializer.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="filedeserializer.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>

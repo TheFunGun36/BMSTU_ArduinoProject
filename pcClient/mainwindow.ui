@@ -20,7 +20,7 @@
      <x>0</x>
      <y>0</y>
      <width>600</width>
-     <height>21</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuInfo">
@@ -40,7 +40,15 @@
      <addaction name="actionSetTextSendMode"/>
      <addaction name="actionSetTextRecieveMode"/>
     </widget>
+    <widget class="QMenu" name="menuFile">
+     <property name="title">
+      <string>Файл</string>
+     </property>
+     <addaction name="actionSetFileSendMode"/>
+     <addaction name="actionSetFileRecieveMode"/>
+    </widget>
     <addaction name="menuText"/>
+    <addaction name="menuFile"/>
    </widget>
    <widget class="QMenu" name="menuOptions">
     <property name="title">
@@ -83,6 +91,16 @@
   <action name="actiontest">
    <property name="text">
     <string>test</string>
+   </property>
+  </action>
+  <action name="actionSetFileRecieveMode">
+   <property name="text">
+    <string>Приём</string>
+   </property>
+  </action>
+  <action name="actionSetFileSendMode">
+   <property name="text">
+    <string>Отправка</string>
    </property>
   </action>
  </widget>

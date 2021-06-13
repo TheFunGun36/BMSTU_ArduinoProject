@@ -44,6 +44,12 @@ ErrorCode COMWorker::openPort(QString name)
 
 void COMWorker::sendArrayBegin(QByteArray arr)
 {
+    if (!serialPort->isOpen())
+    {
+        newStatusMessage(QString("Необходимо открыть порт"));
+        return;
+    }
+
     state = State::Sending;
     arrayToSend.clear();
     emit startArraySending();

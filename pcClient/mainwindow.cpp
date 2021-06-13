@@ -14,6 +14,8 @@ MainWindow::MainWindow(QWidget *parent)
     serializers = new QStackedWidget(this);
     textSerializer = new TextSerializerWidget(this);
     textDeserializer = new TextDeserializerWidget(this);
+    fileSerializer = new FileSerializerWidget(this);
+    fileDeserializer = new FileDeserializerWidget(this);
     /*foreach(const QSerialPortInfo & info, QSerialPortInfo::availablePorts())
     {
         QSerialPort port;
@@ -24,6 +26,7 @@ MainWindow::MainWindow(QWidget *parent)
         }
     }*/
     connect(textSerializer, &TextSerializerWidget::dataSerialized, comWorker, &COMWorker::sendArrayBegin);
+    connect(fileSerializer, &FileSerializerWidget::dataSerialized, comWorker, &COMWorker::sendArrayBegin);
 
     connect(ui.actionSetTextSendMode, &QAction::triggered, this,
         [this]() {
@@ -34,6 +37,18 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui.actionSetTextRecieveMode, &QAction::triggered, this,
         [this]() {
             serializers->setCurrentIndex(static_cast<int>(DisplayWidget::TextRecieve));
+        }
+    );
+
+    connect(ui.actionSetFileSendMode, &QAction::triggered, this,
+        [this]() {
+        serializers->setCurrentIndex(static_cast<int>(DisplayWidget::FileSend));
+        }
+    );
+
+    connect(ui.actionSetFileRecieveMode, &QAction::triggered, this,
+        [this]() {
+        serializers->setCurrentIndex(static_cast<int>(DisplayWidget::FileRecieve));
         }
     );
 
@@ -68,13 +83,15 @@ MainWindow::MainWindow(QWidget *parent)
     // ORDER IS IMPORTANT HERE! Should be same as enum DisplayWidget
     serializers->addWidget(textSerializer);
     serializers->addWidget(textDeserializer);
+    serializers->addWidget(fileSerializer);
+    serializers->addWidget(fileDeserializer);
 
     centralWidgetLayout->addWidget(serializers);
 
     ui.centralWidget->setLayout(centralWidgetLayout);
     ui.statusBar->showMessage("Необходимо открыть порт");
-    textSerializer->buttonSetDisabled();
 
+    // Text Serializer Button
     connect(comWorker, &COMWorker::workError, this, &MainWindow::showErrorMessage);
     connect(comWorker, &COMWorker::newStatusMessage, this, &MainWindow::showStatusbarMessage);
 
@@ -86,24 +103,46 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(comWorker, &COMWorker::workError, textSerializer, &TextSerializerWidget::buttonSetEnabled);
 
+    // File Serializer Button
+    connect(comWorker, &COMWorker::startArraySending, fileSerializer, &FileSerializerWidget::buttonSetDisabled);
+    connect(comWorker, &COMWorker::arraySent, fileSerializer, &FileSerializerWidget::buttonSetEnabled);
+
+    connect(comWorker, &COMWorker::startArrayReceiving, fileSerializer, &FileSerializerWidget::buttonSetDisabled);
+    connect(comWorker, &COMWorker::arrayReceived, fileSerializer, &FileSerializerWidget::buttonSetEnabled);
+
+    connect(comWorker, &COMWorker::workError, fileSerializer, &FileSerializerWidget::buttonSetEnabled);
+
+    // Other
     connect(comWorker, &COMWorker::arraySent, this, &MainWindow::endSending);
-    connect(comWorker, &COMWorker::arrayReceived, this, &MainWindow::endReceiving);
+    connect(comWorker, &COMWorker::arrayReceived, this, &MainWindow::endReceiving);    
 }
 
 void MainWindow::endReceiving(QByteArray msg)
 {
-    if (serializers->currentIndex() != static_cast<int>(DisplayWidget::TextRecieve))
-    {
-        QMessageBox::information(this, "Сообщение получено", "Перейдите в окно для прочтения полученного сообщения");
-        serializers->setCurrentIndex(static_cast<int>(DisplayWidget::TextRecieve));
-    }
+    char format = msg[0];
+    msg.remove(0, 1);
 
-    textDeserializer->showDeserializedData(msg);
+    if (format == 't')
+    {
+        if (serializers->currentIndex() != static_cast<int>(DisplayWidget::TextRecieve))
+        {
+            QMessageBox::information(this, "Сообщение получено", "Перейдите в окно для прочтения полученного сообщения");
+            serializers->setCurrentIndex(static_cast<int>(DisplayWidget::TextRecieve));
+        }
+
+        textDeserializer->showDeserializedData(msg);
+    }
+    else if (format == 'f')
+    {        
+        fileDeserializer->saveDeserializedData(msg);
+    }
+    else
+        showErrorMessage(ErrorCode::ReceiveFailed);
 }
 
 void MainWindow::endSending()
 {
-    QMessageBox::information(this, "Выполнено", "Отправка сообщения завершена");
+    QMessageBox::information(this, "Выполнено", "Отправка данных завершена");
 }
 
 void MainWindow::showStatusbarMessage(QString message)
