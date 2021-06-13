@@ -29,4 +29,8 @@ void loop() {
             Serial.write('\xcd');
         }
     }
+    digitalWrite(global::outputPin, HIGH);
+    delay(500);
+    digitalWrite(global::outputPin, LOW);
+    delay(500);
 }
