@@ -10,6 +10,7 @@ COMWorker::COMWorker(QObject *parent)
     ardSendStartSymbol = '\xcb';
     ardSendReadySymbol = '\xcc';
     ardSendFinishSymbol = '\xcd';
+    ardPortCheckSymbol = '\xc0';
     serialPort = new QSerialPort(this);
 
     connect(serialPort, &QSerialPort::readyRead, this, &COMWorker::onComInformationReceive);
@@ -30,9 +31,13 @@ ErrorCode COMWorker::openPort(QString name)
     serialPort->setPortName(name);
     serialPort->setBaudRate(QSerialPort::Baud9600);
     if (!serialPort->open(QIODevice::ReadWrite))
-    {
+    {        
         return ErrorCode::OpenFailed;
     }
+
+    state = State::PortOpenning;
+    serialPort->write(QByteArray(1, ardPortCheckSymbol));
+    emit newStatusMessage(QString("Ожидание ответа от микроконтроллера"));
 
     return ErrorCode::Ok;
 }
@@ -87,8 +92,7 @@ void COMWorker::onComInformationReceive()
         emit startArrayReceiving();
         receiveArray();
         break;
-    case State::Receiving:
-        //qDebug() << static_cast<int>(serialPort->peek(1)[0]);
+    case State::Receiving:        
         if (serialPort->peek(1)[0] == ardReadErrorSymbol)
         {
             serialPort->readAll();
@@ -118,6 +122,15 @@ void COMWorker::onComInformationReceive()
         }
         sendArray();
         break;
+    case State::PortOpenning:
+        if (serialPort->readAll()[0] == ardPortCheckSymbol)
+        {            
+            emit newStatusMessage(QString("Порт с микроконтроллером открыт"));            
+            state = State::Idle;
+            // Unlock Button
+            emit workError(ErrorCode::Ok);
+        }
+        break;
     }
 }
 
@@ -127,8 +140,7 @@ void COMWorker::sendArray()
     {
         serialPort->readAll();
         state = State::Idle;
-        newStatusMessage("Передача сообщения прервана");
-        //newStatusMessage(QString::fromUtf8("Test"));
+        newStatusMessage("Передача сообщения прервана");        
         emit workError(ErrorCode::SendFailed);
         return;
     }
