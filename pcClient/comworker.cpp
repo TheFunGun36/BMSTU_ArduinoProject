@@ -89,7 +89,7 @@ void COMWorker::onComInformationReceive()
         if (serialPort->read(1)[0] != ardSendStartSymbol)
         {
             serialPort->readAll();
-            newStatusMessage(QString("Получен неопознанный сигнал"));            
+            newStatusMessage(QString("Получен неопознанный сигнал"));
             break;
         }
         state = State::Receiving;
@@ -97,7 +97,7 @@ void COMWorker::onComInformationReceive()
         receiveArray();
         break;
     case State::Receiving:
-        if (serialPort->peek(1)[0] == ardReadErrorSymbol) 
+        if (serialPort->peek(1)[0] == ardReadErrorSymbol)
         {
             serialPort->readAll();
             state = State::Idle;
@@ -107,9 +107,9 @@ void COMWorker::onComInformationReceive()
         }
         receiveArray();
         break;
-    case State::Sending:        
+    case State::Sending:
         msg = serialPort->readAll();
-        if (msg.size() == 1 || msg[0] == ardSendFinishSymbol) 
+        if (msg.size() == 1 || msg[0] == ardSendFinishSymbol)
         {
             newStatusMessage(QString("Сообщение отправлено. Отправлено пакетов: ") + QString(countPacks));
             state = State::Idle;
@@ -130,7 +130,7 @@ void COMWorker::onComInformationReceive()
 }
 
 void COMWorker::sendArray()
-{    
+{
     countPacks++;
 
     if (serialPort->write(packageQueue.dequeue()) < 0)
@@ -141,7 +141,7 @@ void COMWorker::sendArray()
         //newStatusMessage(QString::fromUtf8("Test"));
         emit workError(ErrorCode::SendFailed);
         return;
-    }    
+    }
 
     if (packageQueue.isEmpty())
     {
@@ -155,28 +155,33 @@ void COMWorker::sendArray()
 void COMWorker::receiveArray()
 {
     countPacks++;
-    char sizeByte = serialPort->read(1)[0];
-
-    if (sizeByte < 0)
-    {
-        newStatusMessage(QString("Получение сообщения прервано"));
-        emit workError(ErrorCode::ReceiveFailed);        
-        state = State::Idle;
-        return;
-    }
-
+    char sizeByte = serialPort->peek(1)[0];
     char msgSize = sizeByte > 0 ? sizeByte : bufferSize;
 
-    QByteArray msg = serialPort->read(msgSize);
-    arrayToReceive.append(msg);
-
-    if (sizeByte != 0)
+    if (serialPort->size() >= msgSize)
     {
-        msg = arrayToReceive;
-        arrayToReceive.clear();
-        newStatusMessage(QString("Получение пакета № ") + QString(countPacks) + QString(" [Последнего]"));
-        return;
-    }
+        serialPort->read(1);
 
-    newStatusMessage(QString("Получение пакета № ") + QString(countPacks));
+        if (sizeByte < 0)
+        {
+            newStatusMessage(QString("Получение сообщения прервано"));
+            emit workError(ErrorCode::ReceiveFailed);
+            state = State::Idle;
+            return;
+        }
+
+        QByteArray msg = serialPort->read(msgSize);
+        arrayToReceive.append(msg);
+
+        if (sizeByte != 0)
+        {
+            msg = arrayToReceive;
+            arrayToReceive.clear();
+            state = State::Idle;
+            emit arrayReceived(msg);
+            return;
+        }
+
+        newStatusMessage(QString("Получение пакета № ") + QString(countPacks));
+    }
 }

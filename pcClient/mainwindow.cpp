@@ -9,7 +9,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     comWorker = new COMWorker(this);
-    comWorker->openPort("COM8");
+    comWorker->openPort("COM7");
     ui.setupUi(this);
 
     serializers = new QStackedWidget(this);
@@ -45,7 +45,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(comWorker, &COMWorker::newStatusMessage, this, &MainWindow::showStatusbarMessage);
 
     connect(comWorker, &COMWorker::startArraySending, textSerializer, &TextSerializerWidget::buttonSetDisabled);
-    connect(comWorker, &COMWorker::arraySent, textSerializer, &TextSerializerWidget::buttonSetEnabled);    
+    connect(comWorker, &COMWorker::arraySent, textSerializer, &TextSerializerWidget::buttonSetEnabled);
 
     connect(comWorker, &COMWorker::startArrayReceiving, textSerializer, &TextSerializerWidget::buttonSetDisabled);
     connect(comWorker, &COMWorker::arrayReceived, textSerializer, &TextSerializerWidget::buttonSetEnabled);
