@@ -15,7 +15,8 @@ enum class State
 {
     Idle,
     Sending,
-    Receiving
+    Receiving,
+    PortOpenning
 };
 
 class COMWorker : public QObject
@@ -27,6 +28,7 @@ private:
     char ardSendStartSymbol;
     char ardSendReadySymbol;
     char ardSendFinishSymbol;
+    char ardPortCheckSymbol;
     char countPacks;
     State state;
 

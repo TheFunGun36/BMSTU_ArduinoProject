@@ -8,8 +8,7 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    comWorker = new COMWorker(this);
-    comWorker->openPort("COM7");
+    comWorker = new COMWorker(this);    
     ui.setupUi(this);
 
     serializers = new QStackedWidget(this);
@@ -41,10 +40,10 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui.menuSwitchPort, &QMenu::aboutToShow, this,
         [this]() {
             ui.menuSwitchPort->clear();
-            qDebug() << "adjkfghakdfg";
+            bool flag = true;
 
             Q_FOREACH(const QSerialPortInfo & info, QSerialPortInfo::availablePorts())
-            {
+            {                
                 QString portName = info.portName();
                 QAction *action = new QAction(portName, this);
                 connect(action, &QAction::triggered, this,
@@ -53,7 +52,11 @@ MainWindow::MainWindow(QWidget *parent)
                     }
                 );
                 ui.menuSwitchPort->addAction(action);
+                flag = false;
             }
+            
+            if (flag)
+                showStatusbarMessage(QString("Ни один порт не найден"));
         }
     );
 
@@ -69,6 +72,8 @@ MainWindow::MainWindow(QWidget *parent)
     centralWidgetLayout->addWidget(serializers);
 
     ui.centralWidget->setLayout(centralWidgetLayout);
+    ui.statusBar->showMessage("Необходимо открыть порт");
+    textSerializer->buttonSetDisabled();
 
     connect(comWorker, &COMWorker::workError, this, &MainWindow::showErrorMessage);
     connect(comWorker, &COMWorker::newStatusMessage, this, &MainWindow::showStatusbarMessage);
