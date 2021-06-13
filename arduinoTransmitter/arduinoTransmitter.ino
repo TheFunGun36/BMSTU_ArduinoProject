@@ -8,20 +8,25 @@ void setup() {
 void loop() {
     if (Serial.available() > 0)
     {
-        bool isLastTransmission = 0;
-
-        do
+        if (Serial.peek() == '\xc0')
+            Serial.write('\xc0');
+        else
         {
-            int length;
-            global::recievePcInfo(isLastTransmission, length);
-            global::otherArduinoSync();
-            global::arduinoSendInfo(length);
+            bool isLastTransmission = 0;
 
-            if (!isLastTransmission)
-                Serial.write('\xcc');
+            do
+            {
+                int length;
+                global::recievePcInfo(isLastTransmission, length);
+                global::otherArduinoSync();
+                global::arduinoSendInfo(length);
+
+                if (!isLastTransmission)
+                    Serial.write('\xcc');
+            }
+            while (!isLastTransmission);
+
+            Serial.write('\xcd');
         }
-        while (!isLastTransmission);
-
-        Serial.write('\xcd');
     }
 }

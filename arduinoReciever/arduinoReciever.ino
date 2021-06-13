@@ -8,6 +8,13 @@ void setup() {
 }
 
 void loop() {
+    if (Serial.available() > 0)
+    {
+        char ping = Serial.read();
+        
+        if (ping == '\xc0')
+            Serial.write('\xc0');
+    }
     if (global::isLedActive())
     {
         if (global::otherArduinoSync())
