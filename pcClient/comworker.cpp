@@ -51,6 +51,7 @@ void COMWorker::sendArrayBegin(QByteArray arr)
     }
 
     state = State::Sending;
+    countPacks = 1;
     arrayToSend.clear();
     packageQueue.clear();
     emit startArraySending();
