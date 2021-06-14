@@ -1,6 +1,7 @@
 #include "fileserializer.h"
 #include <qgridlayout.h>
 #include <qmessagebox.h>
+#include <qsizepolicy.h>
 #include <qlabel.h>
 #include <qwidget.h>
 #include <qfiledialog.h>
@@ -8,28 +9,31 @@
 
 #include <qdebug.h>
 
-FileSerializerWidget::FileSerializerWidget(QWidget *parent): QWidget(parent)
+FileSerializerWidget::FileSerializerWidget(QWidget *parent) : QWidget(parent)
 {
-    QVBoxLayout* layout = new QVBoxLayout(this);
-    QHBoxLayout* layout2 = new QHBoxLayout(this);
+    QVBoxLayout *layout = new QVBoxLayout(this);
+    QHBoxLayout *layout2 = new QHBoxLayout(this);
 
-    label = new QLabel("Выберите файл, а затем нажмите кнопку \"отправить\", чтобы начать его отправить", this);    
+    label = new QLabel("Выберите файл, а затем нажмите кнопку \"отправить\", чтобы начать его отправить", this);
     buttonSend = new QPushButton("Отправить", this);
+    //buttonSend->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum));
     buttonChoice = new QPushButton("Выбрать", this);
+    //buttonChoice->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum));
     fileDialog = new QFileDialog(this);
 
     connect(buttonSend, &QPushButton::clicked, this, &FileSerializerWidget::sendButtonClicked);
     connect(buttonChoice, &QPushButton::clicked, this, &FileSerializerWidget::choiceButtonClicked);
-    
-    layout->addWidget(label, 0, Qt::AlignCenter);
+
+    layout->addWidget(label, 0, Qt::AlignLeft);
     layout->addLayout(layout2);
-    layout2->addSpacing(1200);
-    layout2->addWidget(buttonChoice, 0, Qt::AlignRight);    
-    layout2->addWidget(buttonSend, 0, Qt::AlignRight);
+    layout2->addWidget(buttonChoice, 0, Qt::AlignLeft);
+    layout2->addWidget(buttonSend, 0, Qt::AlignLeft);
+    layout2->addStretch(1);
+    layout->addStretch(1);
 }
 
 void FileSerializerWidget::sendButtonClicked()
-{   
+{
     QFile file(filePath);
 
     if (file.open(QIODevice::ReadOnly))
@@ -46,7 +50,7 @@ void FileSerializerWidget::sendButtonClicked()
         file.close();
         emit dataSerialized(result);
     }
-    else 
+    else
     {
         QMessageBox::information(this, "Ошибка", "Не удалось открыть файл");
     }
@@ -54,10 +58,13 @@ void FileSerializerWidget::sendButtonClicked()
 
 void FileSerializerWidget::choiceButtonClicked()
 {
-    filePath = fileDialog->getOpenFileName();        
-    
-    if (filePath != 0)
+    QString newFilePath = fileDialog->getOpenFileName();
+
+    if (!newFilePath.isEmpty())
+    {
+        filePath = newFilePath;
         label->setText(filePath);
+    }
 }
 
 void FileSerializerWidget::buttonSetEnabled()

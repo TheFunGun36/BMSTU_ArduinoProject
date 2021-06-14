@@ -16,8 +16,9 @@ FileDeserializerWidget::FileDeserializerWidget(QWidget* parent) : QWidget(parent
       
     connect(buttonChoice, &QPushButton::clicked, this, &FileDeserializerWidget::choiceButtonClicked);
 
-    layout->addWidget(label, 0, Qt::AlignCenter);
-    layout->addWidget(buttonChoice, 0, Qt::AlignRight);
+    layout->addWidget(label, 0, Qt::AlignLeft);
+    layout->addWidget(buttonChoice, 0, Qt::AlignLeft);
+    layout->addStretch(1);
 }
 
 void FileDeserializerWidget::saveDeserializedData(QByteArray data)
@@ -45,8 +46,11 @@ void FileDeserializerWidget::saveDeserializedData(QByteArray data)
 
 void FileDeserializerWidget::choiceButtonClicked() 
 {
-    sourcePath = fileDialog->getExistingDirectory();
+    QString newFilePath = fileDialog->getOpenFileName();
 
-    if (sourcePath != 0)
+    if (!newFilePath.isEmpty())
+    {
+        sourcePath = newFilePath;
         label->setText(sourcePath);
+    }
 }

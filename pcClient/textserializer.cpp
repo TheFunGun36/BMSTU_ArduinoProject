@@ -13,7 +13,7 @@ TextSerializerWidget::TextSerializerWidget(QWidget *parent)
 
     connect(buttonSend, &QPushButton::clicked, this, &TextSerializerWidget::sendButtonClicked);
 
-    layout->addWidget(new QLabel("Ниже расположено поле для ввода текста. "
+    layout->addWidget(new QLabel("Ниже расположено поле для ввода текста.\n"
         "Введите какой-либо текст, а затем нажмите кнопку \"отправить\", чтобы начать отправку сообщения"));
     layout->addWidget(textInput);
     layout->addWidget(buttonSend, 0, Qt::AlignRight);
