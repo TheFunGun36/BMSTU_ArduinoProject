@@ -37,6 +37,7 @@ void loop() {
                 Serial.write(length * isLastTransaction);
                 global::arduinoRecieveInfo(length);
                 global::sendPcInfo(length);
+                delay(100);
             }
 
             if (!isLastTransaction)
