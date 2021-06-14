@@ -13,7 +13,7 @@ namespace global
 {
     constexpr uint16_t threshold = 1000;
     constexpr int baudRate = 9600;
-    constexpr int maxBufferSize = 64;
+    constexpr int maxBufferSize = 57;
     constexpr int bitLengthMilliseconds = 50;
     constexpr int byteSize = 8;
     constexpr int hammingPackageSize = 64;
