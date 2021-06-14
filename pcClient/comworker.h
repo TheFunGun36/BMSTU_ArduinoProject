@@ -1,7 +1,8 @@
+#pragma once
+
 #include <qserialport>
 #include <qserialportinfo.h>
 #include <qqueue.h>
-#include <qdebug.h>
 
 enum class ErrorCode
 {
@@ -39,6 +40,7 @@ private:
 
     void sendArray();
     void receiveArray();
+    void setState(State value);
 
 public:
     ErrorCode openPort(QString name);
@@ -52,6 +54,7 @@ signals:
     void arrayReceived(QByteArray msg);
     void newStatusMessage(QString msg);
     void workError(ErrorCode);
+    void onStateChanged(State);
 
 private slots:
     void onComInformationReceive();

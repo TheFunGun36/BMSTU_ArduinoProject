@@ -43,4 +43,5 @@ private slots:
     void showErrorMessage(ErrorCode code);
     void endSending();
     void endReceiving(QByteArray msg);
+    void comworkerStateHandler(State newState);
 };

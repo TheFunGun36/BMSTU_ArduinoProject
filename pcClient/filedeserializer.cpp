@@ -12,7 +12,8 @@ FileDeserializerWidget::FileDeserializerWidget(QWidget* parent) : QWidget(parent
 
     label = new QLabel("Выберите директорию для сохранения файлов", this);
     buttonChoice = new QPushButton("Выбрать", this);
-    fileDialog = new QFileDialog(this);    
+    fileDialog = new QFileDialog(this);
+    sourcePath = "";
       
     connect(buttonChoice, &QPushButton::clicked, this, &FileDeserializerWidget::choiceButtonClicked);
 
@@ -22,7 +23,13 @@ FileDeserializerWidget::FileDeserializerWidget(QWidget* parent) : QWidget(parent
 }
 
 void FileDeserializerWidget::saveDeserializedData(QByteArray data)
-{    
+{
+    if (sourcePath.isEmpty())
+    {
+        QMessageBox::information(this, "Ошибка", "Перед получением данных\nнеобходимо выбрать директорию");
+        return;
+    }
+
     int len = data.indexOf('\0');
     QString fileName = QString(len, Qt::Uninitialized);
     for (int i = 0; i < len; i++)
@@ -41,12 +48,12 @@ void FileDeserializerWidget::saveDeserializedData(QByteArray data)
     {
         QMessageBox::information(this, "Ошибка", "Не удалось открыть файл");
     }
-    QMessageBox::information(this, "Файл получен", "Файл сохранён по адрессу: " + sourcePath);
+    QMessageBox::information(this, "Файл получен", "Файл сохранён по адресу: " + sourcePath);
 }
 
 void FileDeserializerWidget::choiceButtonClicked() 
 {
-    QString newFilePath = fileDialog->getOpenFileName();
+    QString newFilePath = fileDialog->getExistingDirectory();
 
     if (!newFilePath.isEmpty())
     {

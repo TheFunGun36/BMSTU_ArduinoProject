@@ -1,7 +1,6 @@
 #include "comworker.h"
 
-COMWorker::COMWorker(QObject *parent)
-    : QObject(parent)
+COMWorker::COMWorker(QObject *parent) : QObject(parent)
 {
     bufferSize = 56;
     countPacks = 1;
@@ -14,6 +13,7 @@ COMWorker::COMWorker(QObject *parent)
     serialPort = new QSerialPort(this);
 
     connect(serialPort, &QSerialPort::readyRead, this, &COMWorker::onComInformationReceive);
+    connect(this, &COMWorker::setState, this, &COMWorker::onStateChanged);
 }
 
 COMWorker::~COMWorker()
@@ -82,7 +82,6 @@ void COMWorker::sendArrayBegin(QByteArray arr)
 
 void COMWorker::onComInformationReceive()
 {
-    qDebug() << serialPort->peek(255);
     QByteArray msg;
 
     switch (state)
@@ -135,17 +134,19 @@ void COMWorker::onComInformationReceive()
         {            
             emit newStatusMessage(QString("Порт с микроконтроллером открыт"));            
             state = State::Idle;
-            // Unlock Button
-            emit workError(ErrorCode::Ok);
         }
         break;
     }
 }
 
+void COMWorker::setState(State value)
+{
+    state = value;
+}
+
 void COMWorker::sendArray()
 {
     QByteArray toWrite = packageQueue.dequeue();
-    qDebug() << toWrite;
 
     if (serialPort->write(toWrite) != toWrite.size())
     {

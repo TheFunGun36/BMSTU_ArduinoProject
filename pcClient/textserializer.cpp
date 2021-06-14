@@ -3,8 +3,7 @@
 #include <qmessagebox.h>
 #include <qlabel.h>
 
-TextSerializerWidget::TextSerializerWidget(QWidget *parent)
-    : QWidget(parent)
+TextSerializerWidget::TextSerializerWidget(QWidget *parent) : QWidget(parent)
 {
     QVBoxLayout *layout = new QVBoxLayout(this);
 
@@ -19,13 +18,24 @@ TextSerializerWidget::TextSerializerWidget(QWidget *parent)
     layout->addWidget(buttonSend, 0, Qt::AlignRight);
 }
 
+void TextSerializerWidget::setActive(bool value)
+{
+    isActive = value;
+}
+
 void TextSerializerWidget::sendButtonClicked()
 {
+    if (!isActive)
+    {
+        QMessageBox::information(this, "Ошибка", "Недостпно отправление данных\nво время другого процесса");
+        return;
+    }
+
     QString str = textInput->toPlainText();
 
     if (str.isEmpty())
     {
-        QMessageBox::information(this, "Отправка текста", "Отправить можно только текст, состоящий как минимум из одного символа");
+        QMessageBox::information(this, "Отправка текста", "Отправить можно только текст,\nсостоящий как минимум из одного символа");
     }
     else
     {
@@ -34,14 +44,4 @@ void TextSerializerWidget::sendButtonClicked()
         result.append(str.toUtf8());
         emit dataSerialized(result);
     }
-}
-
-void TextSerializerWidget::buttonSetEnabled()
-{
-    buttonSend->setEnabled(true);
-}
-
-void TextSerializerWidget::buttonSetDisabled()
-{
-    buttonSend->setDisabled(true);
 }

@@ -3,28 +3,18 @@
 #include <qpushbutton.h>
 #include <qmessagebox.h>
 
-#include <qdebug.h>
-
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
-    comWorker = new COMWorker(this);    
-    ui.setupUi(this);
+    comWorker = new COMWorker(this);
+    ui.setupUi(this);  
+    this->setWindowTitle("Дверъ");
 
     serializers = new QStackedWidget(this);
     textSerializer = new TextSerializerWidget(this);
     textDeserializer = new TextDeserializerWidget(this);
     fileSerializer = new FileSerializerWidget(this);
     fileDeserializer = new FileDeserializerWidget(this);
-    /*foreach(const QSerialPortInfo & info, QSerialPortInfo::availablePorts())
-    {
-        QSerialPort port;
-        port.setPort(info);
-        if (port.open(QIODevice::ReadWrite))
-        {
-            qDebug() << "Name" + info.portName();
-        }
-    }*/
+
     connect(textSerializer, &TextSerializerWidget::dataSerialized, comWorker, &COMWorker::sendArrayBegin);
     connect(fileSerializer, &FileSerializerWidget::dataSerialized, comWorker, &COMWorker::sendArrayBegin);
 
@@ -55,7 +45,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui.menuSwitchPort, &QMenu::aboutToShow, this,
         [this]() {
             ui.menuSwitchPort->clear();
-            bool flag = true;
+            bool portExist = false;
 
             Q_FOREACH(const QSerialPortInfo & info, QSerialPortInfo::availablePorts())
             {                
@@ -63,14 +53,14 @@ MainWindow::MainWindow(QWidget *parent)
                 QAction *action = new QAction(portName, this);
                 connect(action, &QAction::triggered, this,
                     [this, portName]() {
-                        showErrorMessage(comWorker->openPort(portName));
+                        showErrorMessage(comWorker->openPort(portName)); 
                     }
                 );
                 ui.menuSwitchPort->addAction(action);
-                flag = false;
+                portExist = true;
             }
             
-            if (flag)
+            if (!portExist)                
                 showStatusbarMessage(QString("Ни один порт не найден"));
         }
     );
@@ -91,30 +81,12 @@ MainWindow::MainWindow(QWidget *parent)
     ui.centralWidget->setLayout(centralWidgetLayout);
     ui.statusBar->showMessage("Необходимо открыть порт");
 
-    // Text Serializer Button
     connect(comWorker, &COMWorker::workError, this, &MainWindow::showErrorMessage);
     connect(comWorker, &COMWorker::newStatusMessage, this, &MainWindow::showStatusbarMessage);
 
-    connect(comWorker, &COMWorker::startArraySending, textSerializer, &TextSerializerWidget::buttonSetDisabled);
-    connect(comWorker, &COMWorker::arraySent, textSerializer, &TextSerializerWidget::buttonSetEnabled);
-
-    connect(comWorker, &COMWorker::startArrayReceiving, textSerializer, &TextSerializerWidget::buttonSetDisabled);
-    connect(comWorker, &COMWorker::arrayReceived, textSerializer, &TextSerializerWidget::buttonSetEnabled);
-
-    connect(comWorker, &COMWorker::workError, textSerializer, &TextSerializerWidget::buttonSetEnabled);
-
-    // File Serializer Button
-    connect(comWorker, &COMWorker::startArraySending, fileSerializer, &FileSerializerWidget::buttonSetDisabled);
-    connect(comWorker, &COMWorker::arraySent, fileSerializer, &FileSerializerWidget::buttonSetEnabled);
-
-    connect(comWorker, &COMWorker::startArrayReceiving, fileSerializer, &FileSerializerWidget::buttonSetDisabled);
-    connect(comWorker, &COMWorker::arrayReceived, fileSerializer, &FileSerializerWidget::buttonSetEnabled);
-
-    connect(comWorker, &COMWorker::workError, fileSerializer, &FileSerializerWidget::buttonSetEnabled);
-
-    // Other
     connect(comWorker, &COMWorker::arraySent, this, &MainWindow::endSending);
-    connect(comWorker, &COMWorker::arrayReceived, this, &MainWindow::endReceiving);    
+    connect(comWorker, &COMWorker::arrayReceived, this, &MainWindow::endReceiving);
+    connect(comWorker, &COMWorker::onStateChanged, this, &MainWindow::comworkerStateHandler);
 }
 
 void MainWindow::endReceiving(QByteArray msg)
@@ -126,7 +98,7 @@ void MainWindow::endReceiving(QByteArray msg)
     {
         if (serializers->currentIndex() != static_cast<int>(DisplayWidget::TextRecieve))
         {
-            QMessageBox::information(this, "Сообщение получено", "Перейдите в окно для прочтения полученного сообщения");
+            QMessageBox::information(this, "Сообщение получено", "Перейдите в меню для прочтения полученного сообщения");
             serializers->setCurrentIndex(static_cast<int>(DisplayWidget::TextRecieve));
         }
 
@@ -148,6 +120,20 @@ void MainWindow::endSending()
 void MainWindow::showStatusbarMessage(QString message)
 {
     ui.statusBar->showMessage(message);
+}
+
+void MainWindow::comworkerStateHandler(State newState)
+{
+    if (newState == State::Idle)
+    {
+        textSerializer->setActive(true);
+        fileSerializer->setActive(true);
+    }
+    else
+    {
+        textSerializer->setActive(false);
+        fileSerializer->setActive(false);
+    }
 }
 
 void MainWindow::showInfoMessage()

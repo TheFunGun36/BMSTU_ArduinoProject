@@ -2,8 +2,7 @@
 #include <qboxlayout.h>
 #include <qlabel.h>
 
-TextDeserializerWidget::TextDeserializerWidget(QWidget *parent)
-    : QWidget(parent)
+TextDeserializerWidget::TextDeserializerWidget(QWidget *parent) : QWidget(parent)
 {
     textOutput = new QPlainTextEdit(this);
     textOutput->setReadOnly(true);
