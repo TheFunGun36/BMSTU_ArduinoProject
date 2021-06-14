@@ -52,6 +52,7 @@ void COMWorker::sendArrayBegin(QByteArray arr)
 
     state = State::Sending;
     arrayToSend.clear();
+    packageQueue.clear();
     emit startArraySending();
 
     for (int i = 0; i < arr.size(); i += bufferSize)
@@ -142,7 +143,9 @@ void COMWorker::onComInformationReceive()
 
 void COMWorker::sendArray()
 {
-    if (serialPort->write(packageQueue.dequeue()) < 0)
+    QByteArray toWrite = packageQueue.dequeue();
+
+    if (serialPort->write(toWrite) != toWrite.size())
     {
         serialPort->readAll();
         state = State::Idle;
