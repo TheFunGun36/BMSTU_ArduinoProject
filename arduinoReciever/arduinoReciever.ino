@@ -38,6 +38,7 @@ void loop() {
                 Serial.write(recievedLength);
                 global::arduinoRecieveInfo(encodedMessageLength);
                 global::sendPcInfo(messageLength);
+                delay(100);
             }
 
             if (recievedLength == 0)

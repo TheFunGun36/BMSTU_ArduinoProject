@@ -15,7 +15,8 @@ enum class State
 {
     Idle,
     Sending,
-    Receiving
+    Receiving,
+    PortOpenning
 };
 
 class COMWorker : public QObject
@@ -23,8 +24,12 @@ class COMWorker : public QObject
     Q_OBJECT
 private:
     char bufferSize;
-    char comInputSize;
-    char ardReadyReadSymbol;
+    char ardReadErrorSymbol;
+    char ardSendStartSymbol;
+    char ardSendReadySymbol;
+    char ardSendFinishSymbol;
+    char ardPortCheckSymbol;
+    char countPacks;
     State state;
 
     QSerialPort *serialPort;
@@ -41,8 +46,11 @@ public:
     COMWorker::~COMWorker();
 
 signals:
+    void startArraySending();
     void arraySent();
+    void startArrayReceiving();
     void arrayReceived(QByteArray msg);
+    void newStatusMessage(QString msg);
     void workError(ErrorCode);
 
 private slots:
