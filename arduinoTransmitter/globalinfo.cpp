@@ -23,8 +23,13 @@ namespace global
         isLastTransmission = sendBuffer[0] != 0;
         length = sendBuffer[0] ? sendBuffer[0] : (maxBufferSize - 1);
 
-        while (Serial.available() < length);
-        Serial.readBytes(sendBuffer + 1, length);
+        for (char *ptr = sendBuffer + 1; ptr < sendBuffer + 1 + length; ptr++)
+        {
+            while (Serial.available() <= 0);
+            *ptr = Serial.read();
+        }
+        //while (Serial.available() < length);
+        //Serial.readBytes(sendBuffer + 1, length);
     }
 
     void arduinoSendInfo(int length)
