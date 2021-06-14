@@ -8,8 +8,11 @@ void setup() {
 void loop() {
     if (Serial.available() > 0)
     {
-        if (Serial.peek() == '\xc0')
+        if (static_cast<char>(Serial.peek()) == '\xc0')
+        {
             Serial.write('\xc0');
+            Serial.read();
+        }
         else
         {
             bool isLastTransmission = 0;
