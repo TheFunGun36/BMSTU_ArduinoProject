@@ -1,4 +1,5 @@
 #pragma once
+
 #include <qwidget.h>
 #include <qpushbutton.h>
 #include <qlabel.h>
@@ -8,7 +9,7 @@ class FileDeserializerWidget : public QWidget
 {
     Q_OBJECT
 public:
-    FileDeserializerWidget(QWidget* parent = Q_NULLPTR);
+    FileDeserializerWidget(QWidget* parent = Q_NULLPTR);    
 
 public slots:
     void saveDeserializedData(QByteArray data);

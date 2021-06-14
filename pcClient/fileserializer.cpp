@@ -7,8 +7,6 @@
 #include <qfiledialog.h>
 #include <qfile.h>
 
-#include <qdebug.h>
-
 FileSerializerWidget::FileSerializerWidget(QWidget *parent) : QWidget(parent)
 {
     QVBoxLayout *layout = new QVBoxLayout(this);
@@ -16,10 +14,9 @@ FileSerializerWidget::FileSerializerWidget(QWidget *parent) : QWidget(parent)
 
     label = new QLabel("Выберите файл, а затем нажмите кнопку \"отправить\", чтобы начать его отправить", this);
     buttonSend = new QPushButton("Отправить", this);
-    //buttonSend->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum));
     buttonChoice = new QPushButton("Выбрать", this);
-    //buttonChoice->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum));
     fileDialog = new QFileDialog(this);
+    filePath = "";
 
     connect(buttonSend, &QPushButton::clicked, this, &FileSerializerWidget::sendButtonClicked);
     connect(buttonChoice, &QPushButton::clicked, this, &FileSerializerWidget::choiceButtonClicked);
@@ -32,8 +29,25 @@ FileSerializerWidget::FileSerializerWidget(QWidget *parent) : QWidget(parent)
     layout->addStretch(1);
 }
 
+void FileSerializerWidget::setActive(bool value)
+{
+    isActive = value;
+}
+
 void FileSerializerWidget::sendButtonClicked()
 {
+    if (!isActive)
+    {
+        QMessageBox::information(this, "Ошибка", "Недостпно отправление данных\nво время другого процесса");
+        return;
+    }
+
+    if (filePath.isEmpty())
+    {
+        QMessageBox::information(this, "Ошибка", "Необходимо выбрать файл перед отправкой");
+        return;
+    }
+
     QFile file(filePath);
 
     if (file.open(QIODevice::ReadOnly))
@@ -58,6 +72,12 @@ void FileSerializerWidget::sendButtonClicked()
 
 void FileSerializerWidget::choiceButtonClicked()
 {
+    if (!isActive)
+    {
+        QMessageBox::information(this, "Ошибка", "Недоступна смена файла\nво время другого процесса");
+        return;
+    }
+
     QString newFilePath = fileDialog->getOpenFileName();
 
     if (!newFilePath.isEmpty())
@@ -65,14 +85,4 @@ void FileSerializerWidget::choiceButtonClicked()
         filePath = newFilePath;
         label->setText(filePath);
     }
-}
-
-void FileSerializerWidget::buttonSetEnabled()
-{
-    buttonSend->setEnabled(true);
-}
-
-void FileSerializerWidget::buttonSetDisabled()
-{
-    buttonSend->setDisabled(true);
 }

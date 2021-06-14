@@ -1,11 +1,12 @@
 #pragma once
+
 #include <qwidget.h>
 #include <qplaintextedit.h>
 
 class TextDeserializerWidget : public QWidget
 {
 public:
-    TextDeserializerWidget(QWidget *parent = Q_NULLPTR);
+    TextDeserializerWidget(QWidget *parent = Q_NULLPTR);    
 
 private:
     QPlainTextEdit *textOutput;

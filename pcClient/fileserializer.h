@@ -1,4 +1,5 @@
 #pragma once
+
 #include <qwidget.h>
 #include <qplaintextedit.h>
 #include <qpushbutton.h>
@@ -12,6 +13,7 @@ class FileSerializerWidget : public QWidget
 
 public:
     FileSerializerWidget(QWidget* parent = Q_NULLPTR);
+    void setActive(bool value);
 
 private:
     QLabel *label;
@@ -19,10 +21,7 @@ private:
     QPushButton *buttonChoice;
     QFileDialog *fileDialog;
     QString filePath;
-
-public slots:
-    void buttonSetEnabled();
-    void buttonSetDisabled();
+    bool isActive;
 
 private slots:
     void sendButtonClicked();
