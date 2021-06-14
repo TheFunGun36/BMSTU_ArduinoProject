@@ -3,7 +3,7 @@
 COMWorker::COMWorker(QObject *parent)
     : QObject(parent)
 {
-    bufferSize = 63;
+    bufferSize = 56;
     countPacks = 1;
     state = State::Idle;
     ardReadErrorSymbol = '\xce';
@@ -144,6 +144,7 @@ void COMWorker::onComInformationReceive()
 void COMWorker::sendArray()
 {
     QByteArray toWrite = packageQueue.dequeue();
+    qDebug() << toWrite;
 
     if (serialPort->write(toWrite) != toWrite.size())
     {
