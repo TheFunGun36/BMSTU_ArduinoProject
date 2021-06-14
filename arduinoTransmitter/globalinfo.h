@@ -16,6 +16,8 @@ namespace global
     constexpr int hammingPackageSize = 64;
     constexpr int outputPin = 2;
 
+
+    void codeInfo();
     void arduinoSendByte(char byte);
     void recievePcInfo(bool &isLastTransmission, int &length);
     void arduinoSendInfo(int length);
