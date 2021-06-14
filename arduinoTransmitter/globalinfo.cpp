@@ -61,7 +61,7 @@ namespace global
     void getTrueTrueMessage(char trueMessage[], int trueLength, bool calculatedCtrlBits[], int ctrlBitsNumber)
     {
         int number = 1, i, j = 0;
-        for (i = 0; i < trueLength*8 && j < ctrlBitsNumber;i++)
+        for (i = 0; i < trueLength*8 && j < ctrlBitsNumber && number <= trueLength*8;i++)
         {
             if (i == number - 1)
             {
@@ -79,7 +79,7 @@ namespace global
     void getTrueMessage(char message[], char trueMessage[], int messageLength, int trueLength)
     {
         int number = 1, i, j = 0;
-        for (i = 0; i < trueLength*8 && j < trueLength*8;)
+        for (i = 0; i < messageLength*8 && j < trueLength*8;)
         {
             if (j == number - 1)
             {
@@ -106,10 +106,12 @@ namespace global
 
     int hem(char *str, int size_str, char *str_out, int size_str_out)
     {
+
+        
         int ctrlBitsNumber = 0;
-        if (size_str == 8)
+        if (size_str == 2)
         {
-            ctrlBitsNumber = 7;
+            ctrlBitsNumber = 5;
         }
         else if (size_str == 1)
         {
@@ -128,6 +130,12 @@ namespace global
         getTrueMessage(str, str_out, size_str, size_str_out);
 
         calculateCtrlBits(str_out, calculatedCtrlBits, ctrlBitsNumber, size_str_out);
+
+        for (int i = 0; i < ctrlBitsNumber; i++)
+        {
+            cout << calculatedCtrlBits[i];
+        }
+        cout << endl;
         
         getTrueTrueMessage(str_out, size_str_out, calculatedCtrlBits, ctrlBitsNumber);
 
@@ -136,7 +144,7 @@ namespace global
 
     void codeInfo()
     {
-        int size_sendBuffer = int(sendBuffer[0]);
+        int size_sendBuffer = sendBuffer[0] - '0';
         int size_miniBuffer = 8;
         if (size_sendBuffer % size_miniBuffer != 0)
         {
@@ -147,37 +155,32 @@ namespace global
         char code_size_sendBuffer[2];
         hem(sendBuffer, 1, code_size_sendBuffer, 2);
 
-        char code_sendBuffer[maxBufferSize + 8];
-        int i_code_sendBuffer = 0;
+        int i_code_sendBuffer = 2;
 
         char miniBuffer[size_miniBuffer], code_miniBuffer[size_miniBuffer + 1];
         int j = 0;
 
-        for (int i = 1; i < size_sendBuffer; i++)
+        for (int i = 1; i < size_sendBuffer + 1; i++)
         {
             if (i % size_miniBuffer != 0)
             {
-                miniBuffer[j] = sendBuffer[i];
+                miniBuffer[j++] = sendBuffer[i];
             }
             else
             {
+                miniBuffer[j++] = sendBuffer[i];
                 hem(miniBuffer, j, code_miniBuffer, j + j/size_miniBuffer);
-                for (int k = 0; k < j && i_code_sendBuffer < size_sendBuffer + 8; k++)
+
+                for (int k = 0; k < j + j/size_miniBuffer; k++)
                 {
-                    code_sendBuffer[i_code_sendBuffer++] = code_miniBuffer[k];
+                    sendBuffer[i_code_sendBuffer++] = code_miniBuffer[k];
                 }
                 j = 0;
             }
         }
 
-        for (int i = 0; i < size_sendBuffer; i++)
-        {
-            if (i == 0 || i == 1)
-            {
-                sendBuffer[i] = code_size_sendBuffer[i];
-            }
-            sendBuffer[i] = code_sendBuffer[i - 1];
-        }
+        sendBuffer[0] = code_size_sendBuffer[0];
+        sendBuffer[1] = code_size_sendBuffer[1];    
     }
 
 
