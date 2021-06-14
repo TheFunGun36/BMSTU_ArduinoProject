@@ -4,7 +4,7 @@ COMWorker::COMWorker(QObject *parent) : QObject(parent)
 {
     bufferSize = 56;
     countPacks = 1;
-    state = State::Idle;
+    setState(State::Idle);
     ardReadErrorSymbol = '\xce';
     ardSendStartSymbol = '\xcb';
     ardSendReadySymbol = '\xcc';
@@ -13,7 +13,6 @@ COMWorker::COMWorker(QObject *parent) : QObject(parent)
     serialPort = new QSerialPort(this);
 
     connect(serialPort, &QSerialPort::readyRead, this, &COMWorker::onComInformationReceive);
-    connect(this, &COMWorker::setState, this, &COMWorker::onStateChanged);
 }
 
 COMWorker::~COMWorker()
@@ -35,7 +34,7 @@ ErrorCode COMWorker::openPort(QString name)
         return ErrorCode::OpenFailed;
     }
 
-    state = State::PortOpenning;
+    setState(State::PortOpenning);
     serialPort->write(QByteArray(1, ardPortCheckSymbol));
     emit newStatusMessage(QString("Ожидание ответа от микроконтроллера"));
 
@@ -50,7 +49,7 @@ void COMWorker::sendArrayBegin(QByteArray arr)
         return;
     }
 
-    state = State::Sending;
+    setState(State::Sending);
     countPacks = 1;
     arrayToSend.clear();
     packageQueue.clear();
@@ -95,7 +94,7 @@ void COMWorker::onComInformationReceive()
             newStatusMessage(QString("Получен неопознанный сигнал"));
             break;
         }
-        state = State::Receiving;
+        setState(State::Receiving);
         emit startArrayReceiving();
         receiveArray();
         break;
@@ -103,7 +102,7 @@ void COMWorker::onComInformationReceive()
         if (serialPort->peek(1)[0] == ardReadErrorSymbol)
         {
             serialPort->readAll();
-            state = State::Idle;
+            setState(State::Idle);
             newStatusMessage(QString("Получение сообщения прервано"));
             workError(ErrorCode::ReceiveFailed);
             break;
@@ -115,14 +114,14 @@ void COMWorker::onComInformationReceive()
         if (msg.size() == 1 && msg[0] == ardSendFinishSymbol)
         {
             newStatusMessage(QString("Сообщение отправлено. Отправлено пакетов: ") + QString::number(countPacks));
-            state = State::Idle;
+            setState(State::Idle);
             emit arraySent();
             break;
         }
         if (msg.size() != 1 || msg[0] != ardSendReadySymbol)
         {
             serialPort->readAll();
-            state = State::Idle;
+            setState(State::Idle);
             newStatusMessage(QString("Передача сообщения прервана"));
             emit workError(ErrorCode::SendFailed);
             break;
@@ -133,7 +132,7 @@ void COMWorker::onComInformationReceive()
         if (serialPort->readAll()[0] == ardPortCheckSymbol)
         {            
             emit newStatusMessage(QString("Порт с микроконтроллером открыт"));            
-            state = State::Idle;
+            setState(State::Idle);
         }
         break;
     }
@@ -142,6 +141,7 @@ void COMWorker::onComInformationReceive()
 void COMWorker::setState(State value)
 {
     state = value;
+    emit onStateChanged(value);
 }
 
 void COMWorker::sendArray()
@@ -151,7 +151,7 @@ void COMWorker::sendArray()
     if (serialPort->write(toWrite) != toWrite.size())
     {
         serialPort->readAll();
-        state = State::Idle;
+        setState(State::Idle);
         newStatusMessage("Передача сообщения прервана");        
         emit workError(ErrorCode::SendFailed);
         return;
@@ -183,7 +183,7 @@ void COMWorker::receiveArray()
         if (sizeByte < 0)
         {
             newStatusMessage(QString("Получение сообщения прервано"));
-            state = State::Idle;
+            setState(State::Idle);
             emit workError(ErrorCode::ReceiveFailed);
             return;
         }
@@ -194,7 +194,7 @@ void COMWorker::receiveArray()
         if (sizeByte != 0)
         {
             msg = arrayToReceive;
-            state = State::Idle;
+            setState(State::Idle);
             emit arrayReceived(msg);
             return;
         }
