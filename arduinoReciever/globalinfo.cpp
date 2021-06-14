@@ -69,11 +69,11 @@ namespace global
     void arduinoRecieveLength(char &lengthRecieved, char &length, char &trueLength)
     {
         receiveLength(&lengthRecieved);
-        length = lengthRecieved == 0 ? (maxBufferSize - 1) : sendBuffer[0];
+        length = lengthRecieved == 0 ? (maxBufferSize - 1) : lengthRecieved;
         trueLength = length;
-        if ((length % 8) != 0)
-            trueLength = ((length / 8) + 1) * 8;
-        trueLength += trueLength / 8;
+        if ((length % 7) != 0)
+            trueLength = ((length / 7) + 1) * 7;
+        trueLength += trueLength / 7;
     }
 
     void arduinoRecieveInfo(char trueLength)
